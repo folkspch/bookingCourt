@@ -74,6 +74,11 @@ export default {
           to: "/",
         },
         {
+          icon: "mdi-soccer-field",
+          title: "สนาม",
+          to: "/stadium",
+        },
+        {
           icon: "mdi-timetable",
           title: "ตารางเวลา",
           to: "/timetable",
