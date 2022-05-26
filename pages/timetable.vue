@@ -1,38 +1,73 @@
 <template>
   <div>
-  <div v-for="(item, index) in this.courtList" :key="index">
-    <v-card
-      style="padding: 10px"
-      max-width="50%"
-      class="d-flex mx-auto my-6"
-      light
-    >
-      <v-col cols="3">
-        <img width="150" :src="courtPic[index]" />
-      </v-col>
-      <v-col cols="5">
-        <v-card-title>{{courtList[index]}}</v-card-title>
-        <v-btn color="success" style="margin-left: 15px">เลือก</v-btn>
-      </v-col>
-    </v-card>
-  </div>
+    <v-col class="d-flex" cols="12" sm="6">
+      <v-select v-model="selectedCourt" :items="listCourt" solo></v-select>
+    </v-col>
+    {{this.selectedCourt}}
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
-    data() {
+  asyncData() {
+    return axios.get("http://localhost:4000/getCourtData").then((res) => {
+      let courtt=[];
+      courtt = res.data;
+      let listCourtt=[];
+      for (let i = 0; i < courtt.length; i++) {
+        listCourtt[i] = courtt[i].Name_th;
+      }
+      console.log(listCourtt);
+      return{
+       court:courtt,
+       listCourt:listCourtt
+      }
+    });
+  },
+  data() {
     return {
-      courtList: ["สนามบาสเกตบอล", "สนามแบดมินตัน", "สนามฟุตซอล"],
-      courtPic: [
-        "https://img.lovepik.com/photo/50154/0220.jpg_wh860.jpg",
-        "https://media-cdn.tripadvisor.com/media/photo-s/0a/b2/e9/e1/caption.jpg",
-        "https://s.isanook.com/sp/0/ud/9/46940/413286-01.jpg",
+      court: [
+        {
+          Description_en: "",
+          Description_th: "",
+          Id: "",
+          Img: "",
+          Name_en: "",
+          Name_th: "",
+          Place_en: "",
+          Type_en: "",
+          Type_th: "",
+        },
       ],
+      listCourt: [],
+      selectedCourt:'',
     };
+  },
+
+  methods: {
+    API() {
+      const options = {
+        url: `http://localhost:4000/getCourtData`,
+        method: "GET",
+      };
+      this.$axios(options).then((res) => {
+        this.court = res.data;
+        for (let i = 0; i < this.court.length; i++) {
+          this.listCourt[i] = this.court[i].Name_th;
+        }
+        console.log(this.court);
+      });
+    },
+    print() {
+      console.log(this.court);
+    },
+  },
+  mounted() {
+    // console.log("mmmmmm"+this.listCourt);
+    // this.API();
   },
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

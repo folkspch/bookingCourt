@@ -7,11 +7,11 @@
             <v-subheader style="font-size: 20px">รายชื่อสนาม</v-subheader>
             <v-list-item-group v-model="selectedID" color="primary">
               <v-list-item v-for="(item, index) in this.data" :key="index">
-                <v-list-item-icon>
-                  <!-- <v-icon v-text="item.icon"></v-icon> -->
-                </v-list-item-icon>
+                <!-- <v-list-item-icon>
+                  <v-icon v-text="item.icon"></v-icon>
+                </v-list-item-icon> -->
                 <v-list-item-content>
-                  <v-list-item-title v-text="item.name_th"></v-list-item-title>
+                  <v-list-item-title v-text="item.Name_th"></v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
@@ -30,16 +30,18 @@
             <v-card-title>รายละเอียดสนาม</v-card-title>
             <div class="mx-auto">
               <v-card-text>
-                <p>ชื่อสนาม : {{ this.data[selectedID].name_th }}</p>
-                <p>ชนิดสนามกีฬา : {{ this.data[selectedID].type_th }}</p>
-                <p>สถานที่ตั้ง : {{ this.data[selectedID].place_th }}</p>
+                <p>ชื่อสนาม : {{ this.data[selectedID].Name_th }}</p>
+                <p>ชนิดสนามกีฬา : {{ this.data[selectedID].Type_th }}</p>
+                <p>สถานที่ตั้ง : {{ this.data[selectedID].Place_th }}</p>
                 <p>
                   จำนวนผู้เล่นที่อนุญาตให้จอง :
-                  {{ this.data[selectedID].description_th }}
+                  {{ this.data[selectedID].Description_th }}
                 </p>
               </v-card-text>
             </div>
-            <v-img max-width="600px" :src="this.data[selectedID].img"> </v-img>
+            <v-img max-width="600px" :src="this.data[selectedID].Img">
+            <!-- <v-img src="https://bpicc.cc/i/v5d2lU"></v-img> -->
+            </v-img>
             <!-- {{selectedID}} -->
           </v-card>
         </div>
@@ -56,15 +58,15 @@ export default {
       pic: "https://cdn2.iconfinder.com/data/icons/pretty-office-part-7/256/football_pitch-512.png",
       data: [
         {
-          description_en: "",
-          description_th: "",
-          id: "",
-          img: "",
-          name_en: "",
-          name_th: "",
-          place_en: "",
-          type_en: "",
-          type_th: "",
+          Description_en: "",
+          Description_th: "",
+          Id: "",
+          Img: "",
+          Name_en: "",
+          Name_th: "",
+          Place_en: "",
+          Type_en: "",
+          Type_th: "",
         },
       ],
     };
@@ -72,7 +74,7 @@ export default {
   methods: {
     API() {
       const options = {
-        url: `https://testapi.folkspch.repl.co/courts`,
+        url: `http://localhost:4000/getCourtData`,
         method: "GET",
       };
       this.$axios(options).then((res) => {
@@ -94,4 +96,3 @@ export default {
   padding: 20px;
 }
 </style>>
-
