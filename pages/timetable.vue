@@ -10,7 +10,7 @@
         solo
       ></v-select>
     </v-col>
-    <v-simple-table>
+    <v-simple-table class="mb-5">
       <template v-slot:default>
         <thead>
           <tr>
@@ -52,13 +52,27 @@
         </tbody>
       </template>
     </v-simple-table>
+    
+    <v-divider></v-divider>
+    
+    <CourtDetail
+      :court="this.court"
+      :selectedCourt="selectedCourt"
+      :page="'timetable'"
+    />
     <!-- {{ this.selectedCourt }} -->
+    <!-- <v-btn @click="findData(selectedCourt,'Description_th')">GHGHG</v-btn> -->
   </div>
 </template>
 
 <script>
+import CourtDetail from "@/components/CourtDetail.vue";
 import axios from "axios";
 export default {
+  components: {
+    CourtDetail,
+    
+  },
   asyncData() {
     return axios.get("http://localhost:4000/getCourtData").then((res) => {
       let courtt = [];
@@ -67,8 +81,8 @@ export default {
       for (let i = 0; i < courtt.length; i++) {
         listCourtt[i] = courtt[i].Name_th;
       }
-      console.log(courtt);
-      console.log(listCourtt);
+      // console.log(courtt);
+      // console.log(listCourtt);
       return {
         court: courtt,
         listCourt: listCourtt,
@@ -132,9 +146,30 @@ export default {
       //   }
       // });
     },
-    print() {
-      console.log(this.court);
-    },
+    // findData(courtId,field) {
+    //   // console.log(this.court.find((x) => x.Court_id === courtId));
+    //   let data = this.court.find((x) => x.Court_id === courtId)
+    //   console.log(data);
+    //   if(field=='Description_th'){
+    //     return data.Description_th
+    //   }
+    //   else if(field=='Name_th'){
+    //     return data.Name_th
+    //   }
+    //   else if(field=='Place_th'){
+    //     return data.Place_th
+    //   }
+    //   else if(field=='type_th'){
+    //     return data.Type_th
+    //   }
+    //   else if(field=='Img'){
+    //     return data.Img
+    //   }
+      
+    //   data.find((x) => field === courtId)
+    //   console.log("dsdsad",data);
+    //   return data
+    // },
     plotTable() {
       let d = new Date();
       let today =
@@ -147,13 +182,13 @@ export default {
       this.$axios(options).then((res) => {
         this.table = res.data.data;
         console.log(this.table);
-        for(let i = 0; i < this.time.length; i++){
+        for (let i = 0; i < this.time.length; i++) {
           let temp = i + 1;
           let table = temp.toString();
           let temp1 = document.getElementById("table" + table);
-              temp1.classList.remove("reserved");
-              temp1.classList.remove("inPorgress");
-              temp1.classList.remove("free");
+          temp1.classList.remove("reserved");
+          temp1.classList.remove("inPorgress");
+          temp1.classList.remove("free");
         }
 
         for (let i = 0; i < this.time.length; i++) {
@@ -172,18 +207,17 @@ export default {
               let temp = document.getElementById("table" + table);
               temp.classList.add("inProgress");
               // console.log("plot0");
-            } 
-          }
-          else{
-              
-              let temp = document.getElementById("table" + table);
-              temp.classList.add("free");
+            }
+          } else {
+            let temp = document.getElementById("table" + table);
+            temp.classList.add("free");
           }
         }
       });
     },
   },
   mounted() {
+    console.log(this.court);
     // console.log("mmmmmm"+this.listCourt);
     // this.API();
   },
@@ -207,6 +241,6 @@ export default {
   background-color: #4caf50;
   border-style: solid;
   border-width: 5px;
-  border-color:#ebecf0;
+  border-color: #ebecf0;
 }
 </style>

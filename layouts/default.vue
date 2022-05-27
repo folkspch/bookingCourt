@@ -6,7 +6,7 @@
       :clipped="clipped"
       fixed
       app
-      color="#92b9e7"
+      :color="themeColor"
       
     >
       <v-row
@@ -34,7 +34,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar :clipped-left="clipped" fixed app color="#92b9e7">
+    <v-app-bar :clipped-left="clipped" fixed app :color="themeColor">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-spacer/>
       <a style="color:white;margin-right:0;">ออกจากระบบ</a>
@@ -64,6 +64,8 @@
 export default {
   data() {
     return {
+      // themeColor:"#92B9E7",
+      themeColor:"#ff964f",
       clipped: false,
       drawer: false,
       fixed: false,
