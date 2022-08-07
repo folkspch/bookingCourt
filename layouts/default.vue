@@ -37,6 +37,8 @@
     <v-app-bar :clipped-left="clipped" fixed app :color="themeColor">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-spacer/>
+      <a style="color:white;margin-right:0;">การจองของฉัน</a>
+      <v-divider light vertical inset class="mx-2"></v-divider>
       <a style="color:white;margin-right:0;">ออกจากระบบ</a>
     </v-app-bar>
     <v-main>
@@ -44,7 +46,7 @@
         <Nuxt />
       </v-container>
     </v-main>
-    <v-navigation-drawer v-model="rightDrawer" :right="right" temporary fixed>
+    <!-- <v-navigation-drawer v-model="rightDrawer" :right="right" temporary fixed>
       <v-list>
         <v-list-item @click.native="right = !right">
           <v-list-item-action>
@@ -53,7 +55,7 @@
           <v-list-item-title>Switch drawer (click me)</v-list-item-title>
         </v-list-item>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer> -->
     <v-footer :absolute="!fixed" app>
       <span>KMUTNB &copy; {{ new Date().getFullYear() }}</span>
     </v-footer>

@@ -52,9 +52,9 @@
         </tbody>
       </template>
     </v-simple-table>
-    
+
     <v-divider></v-divider>
-    
+
     <CourtDetail
       :court="this.court"
       :selectedCourt="selectedCourt"
@@ -62,6 +62,15 @@
     />
     <!-- {{ this.selectedCourt }} -->
     <!-- <v-btn @click="findData(selectedCourt,'Description_th')">GHGHG</v-btn> -->
+    <!-- <div id="gg">
+    <p @click="print()">
+      asdasdasd
+    </p>
+  </div> -->
+    <!-- <v-btn @click="test()">
+    gg
+  </v-btn>
+  <div v-html="this.temp[0].Rules_P1" ></div> -->
   </div>
 </template>
 
@@ -71,7 +80,6 @@ import axios from "axios";
 export default {
   components: {
     CourtDetail,
-    
   },
   asyncData() {
     return axios.get("http://localhost:4000/getCourtData").then((res) => {
@@ -106,21 +114,50 @@ export default {
       ],
       listCourt: [],
       selectedCourt: null,
+      timev2: [
+        ["08.00", "09.00"],
+        ["09.00", "10.00"],
+        ["10.00", "11.00"],
+        ["11.00", "12.00"],
+        ["12.00", "13.00"],
+        ["13.00", "14.00"],
+        ["14.00", "15.00"],
+        ["15.00", "16.00"],
+        ["16.00", "17.00"],
+        ["17.00", "18.00"],
+      ],
       time: [
         "8.00-9.00",
         "9.00-10.00",
         "10.00-11.00",
         "11.00-12.00",
         "12.00-13.00",
+        "13.00-14.00",
         "14.00-15.00",
+        "15.00-16.00",
         "16.00-17.00",
-        "18.00-19.00",
+        "17.00-18.00",
       ],
       table: [],
+      plotStatus: 0,
     };
   },
 
   methods: {
+    // print(){
+    //   let temp = document.getElementById('gg');
+    //   console.log(temp)
+    // },
+    test() {
+      const options = {
+        url: `http://localhost:4000/getRules`,
+        method: "GET",
+      };
+      this.$axios(options).then((res) => {
+        this.temp = res.data;
+        console.log("temp ", this.temp);
+      });
+    },
     API(date, court) {
       // const options = {
       //   url: `http://localhost:4000/getBookingData/${date}/${court}`,
@@ -146,30 +183,15 @@ export default {
       //   }
       // });
     },
-    // findData(courtId,field) {
-    //   // console.log(this.court.find((x) => x.Court_id === courtId));
-    //   let data = this.court.find((x) => x.Court_id === courtId)
-    //   console.log(data);
-    //   if(field=='Description_th'){
-    //     return data.Description_th
-    //   }
-    //   else if(field=='Name_th'){
-    //     return data.Name_th
-    //   }
-    //   else if(field=='Place_th'){
-    //     return data.Place_th
-    //   }
-    //   else if(field=='type_th'){
-    //     return data.Type_th
-    //   }
-    //   else if(field=='Img'){
-    //     return data.Img
-    //   }
+    isInRange(value, range) {
+      if(this.plotStatus == 1){
+        return true
+      }
+      else{
+        return value <= range[0];
+      }
       
-    //   data.find((x) => field === courtId)
-    //   console.log("dsdsad",data);
-    //   return data
-    // },
+    },
     plotTable() {
       let d = new Date();
       let today =
@@ -194,24 +216,32 @@ export default {
         for (let i = 0; i < this.time.length; i++) {
           let temp = i + 1;
           let table = temp.toString();
-          // console.log(table)
-          if (this.table.find((x) => x.Time === table)) {
-            console.log(table);
-            if (this.table.find((x) => x.Time === table).Status === "1") {
+          let timeNow =
+            ("0" + d.getHours()).slice(-2) +
+            "." +
+            ("0" + d.getMinutes()).slice(-2);
+          // console.log(timeNow, this.timev2[i]);
+          // if (this.isInRange(timeNow, this.timev2[i])) {
+            // console.log("w");
+            // this.plotStatus = 1;
+            if (this.table.find((x) => x.Time === table)) {
+              console.log(table);
+              if (this.table.find((x) => x.Time === table).Status === "1") {
+                let temp = document.getElementById("table" + table);
+                temp.classList.add("reserved");
+                // console.log("plot1");
+              } else if (
+                this.table.find((x) => x.Time === table).Status === "0"
+              ) {
+                let temp = document.getElementById("table" + table);
+                temp.classList.add("inProgress");
+                // console.log("plot0");
+              }
+            } else {
               let temp = document.getElementById("table" + table);
-              temp.classList.add("reserved");
-              // console.log("plot1");
-            } else if (
-              this.table.find((x) => x.Time === table).Status === "0"
-            ) {
-              let temp = document.getElementById("table" + table);
-              temp.classList.add("inProgress");
-              // console.log("plot0");
+              temp.classList.add("free");
             }
-          } else {
-            let temp = document.getElementById("table" + table);
-            temp.classList.add("free");
-          }
+          // }
         }
       });
     },
@@ -239,6 +269,12 @@ export default {
 }
 .free {
   background-color: #4caf50;
+  border-style: solid;
+  border-width: 5px;
+  border-color: #ebecf0;
+}
+.none {
+  background-color: #ebecf0;
   border-style: solid;
   border-width: 5px;
   border-color: #ebecf0;
