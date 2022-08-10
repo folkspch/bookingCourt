@@ -37,6 +37,10 @@
                   จำนวนผู้เล่นที่อนุญาตให้จอง :
                   {{ this.data[selectedID].Description_th }}
                 </p>
+                <p>
+                  เวลาเปิด :
+                  {{ this.data[selectedID].TimeOpen.substring(5, 0)}} - {{ this.data[selectedID].TimeClose.substring(5, 0)}}
+                </p>
               </v-card-text>
             </div>
             <v-img max-width="600px" :src="this.data[selectedID].Img">

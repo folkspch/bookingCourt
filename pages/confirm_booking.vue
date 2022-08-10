@@ -73,10 +73,27 @@
     </v-dialog>
     <v-col cols="6">
       <v-card>
-        <v-list-item>
-          <v-list-item-title>รายชื่อผู้เข้าร่วมการจอง</v-list-item-title>
-        </v-list-item>
-        <div v-if="this.inviteList.length != 0">
+        <!-- <v-list-item> -->
+        <v-system-bar window>
+          <v-card-title>รายชื่อผู้เข้าร่วมการจอง</v-card-title>
+          <v-spacer></v-spacer>
+          <div>
+            รหัสเข้าร่วม: {{ this.code }}
+              <v-icon @click="copyToClipboard()" small color="orange lighten-1">mdi-content-copy</v-icon>
+          </div>
+          <v-divider light vertical inset class="mr-2"></v-divider>
+          <v-btn x-small>
+            <v-icon color="green lighten-1">mdi-refresh</v-icon>
+            รีเฟรชรายชื่อ
+          </v-btn>
+        </v-system-bar>
+        <!-- </v-list-item> -->
+        <v-card
+          v-if="this.inviteList.length != 0"
+          max-height="500px"
+          class="overflow-auto"
+          elevation="0"
+        >
           <v-list-item v-for="items in this.inviteList" :key="items.id">
             <v-list-item-content>
               <v-list-item-subtitle
@@ -89,12 +106,13 @@
               </v-btn>
             </v-list-item-action>
           </v-list-item>
-        </div>
+        </v-card>
+        <v-card v-else height="500px">
+          <v-card-text class="d-flex justify-center align-center">ไม่มีข้อมูล</v-card-text>
+        </v-card>
       </v-card>
     </v-col>
-    <v-card width="10%">CODE: {{ this.code }}
-          <v-btn>คัดลอก</v-btn>-
-    </v-card>
+   <v-btn @click="test()">hgg</v-btn>
   </div>
 </template>
 
@@ -116,10 +134,16 @@ export default {
         username: "",
         displayname: "",
       },
-      code:'',
+      code: "",
     };
   },
   methods: {
+    test(){
+      console.log(this.$store.state.userId);
+    },
+    copyToClipboard(){
+      navigator.clipboard.writeText(this.code)
+    },
     showDialogCfDel(id, name) {
       this.dialogConfirmDel = true;
       this.delUser.id = id;
@@ -197,7 +221,7 @@ export default {
       //     console.log("temp ", this.temp);
       //   });
     },
-    getCode(){
+    getCode() {
       const options = {
         url: `http://localhost:4000/generateNewCode`,
         method: "GET",
@@ -206,13 +230,16 @@ export default {
         this.code = res.data;
         console.log("code ", this.code);
       });
-    }
+    },
+    getList(){
+
+    },
+    
   },
-  mounted(){
+  mounted() {
     this.getCode();
-  }
+  },
 };
 </script>
 
-<style>
-</style>
+<style></style>
