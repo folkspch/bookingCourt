@@ -79,10 +79,12 @@
           <v-spacer></v-spacer>
           <div>
             รหัสเข้าร่วม: {{ this.code }}
-              <v-icon @click="copyToClipboard()" small color="orange lighten-1">mdi-content-copy</v-icon>
+            <v-icon @click="copyToClipboard()" small color="orange lighten-1"
+              >mdi-content-copy</v-icon
+            >
           </div>
           <v-divider light vertical inset class="mr-2"></v-divider>
-          <v-btn x-small>
+          <v-btn @click="getLobbyList()" x-small>
             <v-icon color="green lighten-1">mdi-refresh</v-icon>
             รีเฟรชรายชื่อ
           </v-btn>
@@ -101,18 +103,24 @@
               >
             </v-list-item-content>
             <v-list-item-action>
-              <v-btn icon @click="showDialogCfDel(items.id, items.name)">
+              <v-btn
+                v-if="checkDelBtn(items.id)"
+                icon
+                @click="showDialogCfDel(items.id, items.name)"
+              >
                 <v-icon color="red lighten-1">mdi-minus-circle</v-icon>
               </v-btn>
             </v-list-item-action>
           </v-list-item>
         </v-card>
         <v-card v-else height="500px">
-          <v-card-text class="d-flex justify-center align-center">ไม่มีข้อมูล</v-card-text>
+          <v-card-text class="d-flex justify-center align-center"
+            >ไม่มีข้อมูล</v-card-text
+          >
         </v-card>
       </v-card>
     </v-col>
-   <v-btn @click="test()">hgg</v-btn>
+    <v-btn @click="test()">hgg</v-btn>
   </div>
 </template>
 
@@ -138,11 +146,18 @@ export default {
     };
   },
   methods: {
-    test(){
+    test() {
       console.log(this.$store.state.userId);
     },
-    copyToClipboard(){
-      navigator.clipboard.writeText(this.code)
+    checkDelBtn(x) {
+      if (x == this.$store.state.userId) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    copyToClipboard() {
+      navigator.clipboard.writeText(this.code);
     },
     showDialogCfDel(id, name) {
       this.dialogConfirmDel = true;
@@ -151,11 +166,30 @@ export default {
     },
     deleteFromList(x) {
       console.log(x);
-      var del = this.inviteList.findIndex((e) => e.id === x);
-      console.log(del);
-      this.inviteList.splice(del, 1);
+      // let body = {
+      //   userId: x,
+      //   code: this.code,
+      //   court: this.$store.state.selectedCourt,
+      // };
+      // console.log(body);
+      axios
+        .delete("http://localhost:4000/delFromList", {
+          data: {
+            userId: x,
+            code: this.code,
+            court: this.$store.state.selectedCourt,
+          },
+        })
+        .then((res) => {
+          console.log(res);
+          this.getLobbyList();
+        });
+      // var del = this.inviteList.findIndex((e) => e.id === x);
+      // console.log(del);
+      // this.inviteList.splice(del, 1);
       this.dialogConfirmDel = false;
-      console.log(this.inviteList);
+
+      // console.log(this.inviteList);
     },
     addToInviteList() {
       this.inviteList.push({
@@ -221,24 +255,64 @@ export default {
       //     console.log("temp ", this.temp);
       //   });
     },
-    getCode() {
-      const options = {
-        url: `http://localhost:4000/generateNewCode`,
-        method: "GET",
+    createLobby() {
+      let body = {
+        userId: this.$store.state.userId,
+        userName: this.$store.state.userName,
+        court: this.$store.state.selectedCourt,
       };
-      this.$axios(options).then((res) => {
-        this.code = res.data;
-        console.log("code ", this.code);
-      });
+      if ((body.userId != "") & (body.court != "") & (body.userName != "")) {
+        axios.post("http://localhost:4000/createList", body).then((res) => {
+          this.code = res.data.code;
+          this.getLobbyList();
+        });
+      } else {
+        console.error("error occurred");
+      }
     },
-    getList(){
-
+    getLobbyList() {
+      let body = {
+        court: this.$store.state.selectedCourt,
+        code: this.code,
+        status: 0,
+      };
+      console.log(body);
+      // body.code ='QIbc5l';
+      // body.court ='01'
+      if ((body.code != "") & (body.court != "")) {
+        axios.post("http://localhost:4000/getLobbyData", body).then((res) => {
+          this.inviteList = [];
+          for (let i = 0; i < res.data.length; i++) {
+            this.inviteList.push({
+              id: res.data[i].User_id,
+              name: res.data[i].User_name,
+            });
+          }
+          console.log(this.inviteList, "invitelist");
+        });
+      } else {
+        console.error("error occurred lb");
+      }
     },
-    
   },
   mounted() {
-    this.getCode();
+    // let promise = new Promise((resolve, reject) => {
+    //   this.createLobby();
+    //   resolve();
+    // });
+    // promise.then(() => {
+    //   this.getLobbyList();
+    // });
+    this.createLobby();
+    console.log(this.$store.state.selectedCourt);
+    // setInterval(() => {
+    //   this.getLobbyList()
+    //   console.log("getlb")
+    // }, 5000);
   },
+  destroyed(){
+    console.log("TEST")
+  }
 };
 </script>
 

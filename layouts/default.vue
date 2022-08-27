@@ -14,7 +14,7 @@
         style="margin-top: 30px; margin-bottom: 30px"
       >
         <v-avatar color="white" size="120">
-          <img src="https://www.kindpng.com/picc/m/105-1055656_account-user-profile-avatar-avatar-user-profile-icon.png" alt="profilePic" />
+          <img src="https://sv1.picz.in.th/images/2022/08/19/XeHh6a.jpg" alt="profilePic" />
         </v-avatar>
       </v-row>
       <v-list>

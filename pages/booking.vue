@@ -118,7 +118,7 @@
         </v-col>
         <v-col cols="6">
           <div v-if="this.selectedCourt&&this.selectedTime">
-            <v-btn large bottom right absolute color="success" width="10%" to="/confirm_booking" >ต่อไป</v-btn>
+            <v-btn @click="setSelectedCourt()" large bottom right absolute color="success" width="10%" >ต่อไป</v-btn>
           </div>
         </v-col>
       </v-row>
@@ -186,6 +186,10 @@ export default {
         this.temp = res.data;
         console.log("temp ", this.temp);
       });
+    },
+    setSelectedCourt(){
+      this.$store.commit("setSelectedCourt",this.selectedCourt)
+      this.$router.replace('/confirm_booking');
     },
     isInRange(value, range) {
       if (this.plotStatus == 1) {

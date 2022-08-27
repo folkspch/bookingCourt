@@ -6,10 +6,24 @@ Vue.use(Vuex)
 
 export default () => new Vuex.Store({
   state: () => ({
-    userId:'6104062630506'
+    userId:'',
+    userName:'',
+    selectedCourt:'',
   }),
-  mutations: {},
-  actions: {},
+  mutations: {
+    setSelectedCourt(state,value){
+      state.selectedCourt=value
+    },
+    setUserId(state,value){
+      state.userId=value
+    },
+    setUserName(state,value){
+      state.userName=value
+    },
+  },
+  actions: {
+    
+  },
   modules: {
    
   }

@@ -9,6 +9,6 @@
   font-family: "Prompt", sans-serif;
 }
 .v-application{
-  background:#a1cae2;
+  background:#ff964f;
 }
 </style>
