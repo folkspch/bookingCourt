@@ -9,6 +9,7 @@ export default () => new Vuex.Store({
     userId:'',
     userName:'',
     selectedCourt:'',
+    courtDetail:{}
   }),
   mutations: {
     setSelectedCourt(state,value){
@@ -19,6 +20,9 @@ export default () => new Vuex.Store({
     },
     setUserName(state,value){
       state.userName=value
+    },
+    setCourtDetail(state,value){
+      state.courtDetail=value
     },
   },
   actions: {

@@ -1,21 +1,24 @@
 <template>
   <div>
-    <v-row>
-      <v-col cols="4">
+      <v-row no-gutters class="d-flex">
+      <v-col cols="6" >
         <v-text-field
+          height="51px"
+          hint="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง เช่น s6101234567890"
           v-on:keyup.enter="getInfoByID()"
           v-model="inputID"
-          :rules="rules"
           clearable
           solo
-          label="กรอกรหัสนักศึกษาเพื่อเชิญเข้าร่วมการจอง"
+          label="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง"
           color="black"
-        ></v-text-field>
+        >
+        <!-- <v-btn large slot="append-outer">TEST</v-btn> -->
+      </v-text-field>
       </v-col>
       <v-col cols="1">
         <v-btn
+          height="51px"
           @click="getInfoByID()"
-          large
           color="primary"
           :disabled="this.btnLoading"
           :loading="this.btnLoading"
@@ -71,6 +74,23 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialogEmail">
+      <v-card>
+        <v-card-title>ส่งลิงก์ยืนยันการเข้าร่วมแล้ว</v-card-title>
+        <v-card-text>
+          ส่งลิงก์ยืนยันการเข้าร่วมไปยังอีเมลล์ <br />{{
+            this.inputID + "@email.kmutnb.ac.th"
+          }}
+          แล้ว
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="dialogEmail = false">ตกลง</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-col cols="6">
       <v-card>
         <!-- <v-list-item> -->
@@ -96,7 +116,25 @@
           class="overflow-auto"
           elevation="0"
         >
-          <v-list-item v-for="items in this.inviteList" :key="items.id">
+          <v-simple-table>
+            <tbody>
+              <tr v-for="item in this.inviteList" :key="item.id">
+                <td>{{ item.id }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.status }}</td>
+                <td>
+                  <v-btn
+                    v-if="checkDelBtn(item.id)"
+                    icon
+                    @click="showDialogCfDel(item.id, item.name)"
+                  >
+                    <v-icon color="red lighten-1">mdi-minus-circle</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+          <!-- <v-list-item v-for="items in this.inviteList" :key="items.id">
             <v-list-item-content>
               <v-list-item-subtitle
                 >{{ items.id }} &ensp; {{ items.name }}</v-list-item-subtitle
@@ -111,7 +149,7 @@
                 <v-icon color="red lighten-1">mdi-minus-circle</v-icon>
               </v-btn>
             </v-list-item-action>
-          </v-list-item>
+          </v-list-item> -->
         </v-card>
         <v-card v-else height="500px">
           <v-card-text class="d-flex justify-center align-center"
@@ -120,7 +158,6 @@
         </v-card>
       </v-card>
     </v-col>
-    <v-btn @click="test()">hgg</v-btn>
   </div>
 </template>
 
@@ -129,13 +166,13 @@ import axios from "axios";
 export default {
   data() {
     return {
-      rules: [(value) => !isNaN(value) || "กรอกเฉพาะตัวเลขเท่านั้น"],
       inputID: null,
       btnLoading: false,
       inviteList: [],
       dialog: false,
       dialogError: false,
       dialogConfirmDel: false,
+      dialogEmail: false,
       errorText: { title: "", text: "" },
       delUser: { id: "", name: "" },
       invitee: {
@@ -150,7 +187,10 @@ export default {
       console.log(this.$store.state.userId);
     },
     checkDelBtn(x) {
+      let g = this.inviteList.find((e) => e.id === x);
       if (x == this.$store.state.userId) {
+        return false;
+      } else if (g.status == "Confirmed") {
         return false;
       } else {
         return true;
@@ -192,18 +232,30 @@ export default {
       // console.log(this.inviteList);
     },
     addToInviteList() {
-      this.inviteList.push({
-        id: this.invitee.username,
-        name: this.invitee.displayname,
-      });
+      axios
+        .post("http://localhost:4000/addToList", {
+          userId: this.invitee.username,
+          userName: this.invitee.displayname,
+          code: this.code,
+          court: this.$store.state.selectedCourt,
+          courtName: this.$store.state.courtDetail.courtName,
+          time: this.$store.state.courtDetail.time,
+        })
+        .then((res) => {
+          console.log(res);
+          this.getLobbyList();
+          this.dialog = false;
+          this.dialogEmail = true;
+        });
+      // this.inviteList.push({
+      //   id: this.invitee.username,
+      //   name: this.invitee.displayname,
+      // });
       console.log(this.inviteList);
-      this.dialog = false;
     },
     getInfoByID() {
       if (this.inputID) {
-        var isDulplicate = this.inviteList.find(
-          (e) => e.id === "s" + this.inputID
-        );
+        var isDulplicate = this.inviteList.find((e) => e.id === this.inputID);
         if (isDulplicate) {
           this.errorText.title = "รหัสซ้ำ";
           this.errorText.text = "รหัสนี้มีอยู่แล้ว";
@@ -214,7 +266,7 @@ export default {
         this.btnLoading = true;
         const token = "jnNJKFFN9-X55FNmqmLazn1B47BlYmw7";
         var body = {
-          username: "s" + this.inputID,
+          username: this.inputID,
         };
         const config = {
           headers: { Authorization: `Bearer ${token}` },
@@ -276,16 +328,18 @@ export default {
         code: this.code,
         status: 0,
       };
-      console.log(body);
+      // console.log(body);
       // body.code ='QIbc5l';
       // body.court ='01'
       if ((body.code != "") & (body.court != "")) {
         axios.post("http://localhost:4000/getLobbyData", body).then((res) => {
+          // console.log(res,"resss");
           this.inviteList = [];
           for (let i = 0; i < res.data.length; i++) {
             this.inviteList.push({
               id: res.data[i].User_id,
               name: res.data[i].User_name,
+              status: res.data[i].Invite_status,
             });
           }
           console.log(this.inviteList, "invitelist");
@@ -305,15 +359,17 @@ export default {
     // });
     this.createLobby();
     console.log(this.$store.state.selectedCourt);
-    // setInterval(() => {
-    //   this.getLobbyList()
-    //   console.log("getlb")
-    // }, 5000);
+    setInterval(() => {
+      this.getLobbyList();
+      console.log("getlb");
+    }, 5000);
   },
-  destroyed(){
-    console.log("TEST")
-  }
+  destroyed() {
+    console.log("TEST");
+  },
 };
 </script>
 
-<style></style>
+<style>
+  
+</style>

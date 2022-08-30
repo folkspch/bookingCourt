@@ -44,14 +44,17 @@
             style="padding-top: 13%"
           >
             <v-card width="30%" flat color="transparent">
+              
                 <v-card-title> เข้าสู่ระบบ </v-card-title>
                 <v-card-subtitle> เข้าสู่ระบบโดยใช้บัญชี ICIT </v-card-subtitle>
               <v-card-text>
+                
                 <v-text-field color="orange" v-model="user" label="USERNAME"
                   ><v-icon slot="prepend" color="orange">
                     mdi-account
                   </v-icon></v-text-field
                 >
+                
                 <v-text-field
                   color="orange"
                   v-model="password"
@@ -79,6 +82,7 @@
                   >
                 </div>
               </v-card-text>
+              
             </v-card>
           </v-col>
           <!-- </v-row> -->

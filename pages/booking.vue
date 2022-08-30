@@ -188,7 +188,12 @@ export default {
       });
     },
     setSelectedCourt(){
+      let data = {
+        courtName: this.court.find((e) => e.Court_id === this.selectedCourt).Name_th,
+        time:this.selectedTime[0]+"-"+this.selectedTime[1]
+      }
       this.$store.commit("setSelectedCourt",this.selectedCourt)
+      this.$store.commit("setCourtDetail",data)
       this.$router.replace('/confirm_booking');
     },
     isInRange(value, range) {
