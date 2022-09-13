@@ -7,17 +7,28 @@
       fixed
       app
       :color="themeColor"
-      
     >
       <v-row
         justify="space-around"
         style="margin-top: 30px; margin-bottom: 30px"
       >
         <v-avatar color="white" size="120">
-          <img src="https://sv1.picz.in.th/images/2022/08/19/XeHh6a.jpg" alt="profilePic" />
+          <img
+            src="https://sv1.picz.in.th/images/2022/08/19/XeHh6a.jpg"
+            alt="profilePic"
+          />
         </v-avatar>
       </v-row>
       <v-list>
+        <!-- <div class="d-flex justify-center mb-3"></div> -->
+        <!-- <v-list-item>
+        <v-list-item-action>
+          <v-icon color="primary">mdi-account</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title v-text="this.userInfo.displayname" />
+        </v-list-item-content>
+      </v-list-item> -->
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
@@ -36,10 +47,10 @@
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app :color="themeColor">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-spacer/>
-      <a style="color:white;margin-right:0;">การจองของฉัน</a>
+      <v-spacer />
+      <a style="color: white; margin-right: 0">การจองของฉัน</a>
       <v-divider light vertical inset class="mx-2"></v-divider>
-      <a style="color:white;margin-right:0;">ออกจากระบบ</a>
+      <a @click="logout()" style="color: white; margin-right: 0">ออกจากระบบ</a>
     </v-app-bar>
     <v-main>
       <v-container>
@@ -67,9 +78,13 @@ export default {
   data() {
     return {
       // themeColor:"#92B9E7",
-      themeColor:"#ff964f",
+      userInfo:{
+        username:"",
+        displayname:""
+      },
+      themeColor: "#ff964f",
       clipped: false,
-      drawer: false,
+      drawer: true,
       fixed: false,
       items: [
         {
@@ -109,6 +124,18 @@ export default {
       title: "Vuetify.js",
     };
   },
+  methods: {
+    logout() {
+      this.$auth.logout();
+      // this.$router.replace('/login');
+    },
+  },
+  created() {
+    // console.log(this.$router.name,"router")
+  },
+  mounted(){
+    this.userInfo = this.$auth.$storage.getUniversal('user')
+  }
 };
 </script>
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
   <div>
-      <v-row no-gutters class="d-flex">
-      <v-col cols="6" >
+    <v-row no-gutters class="d-flex">
+      <v-col cols="6">
         <v-text-field
           height="51px"
           hint="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง เช่น s6101234567890"
@@ -12,8 +12,8 @@
           label="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง"
           color="black"
         >
-        <!-- <v-btn large slot="append-outer">TEST</v-btn> -->
-      </v-text-field>
+          <!-- <v-btn large slot="append-outer">TEST</v-btn> -->
+        </v-text-field>
       </v-col>
       <v-col cols="1">
         <v-btn
@@ -90,51 +90,73 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-col cols="6">
-      <v-card>
-        <!-- <v-list-item> -->
-        <v-system-bar window>
-          <v-card-title>รายชื่อผู้เข้าร่วมการจอง</v-card-title>
-          <v-spacer></v-spacer>
-          <div>
-            รหัสเข้าร่วม: {{ this.code }}
-            <v-icon @click="copyToClipboard()" small color="orange lighten-1"
-              >mdi-content-copy</v-icon
+    <v-row>
+      <v-col cols="6">
+        <v-card>
+          <!-- <v-list-item> -->
+          <v-system-bar window>
+            <v-card-title
+              >รายชื่อผู้เข้าร่วมการจอง ({{ this.memberCount }}/{{
+                parseInt(
+                  this.$store.state.courtDetail.Description_th.substring(0, 2)
+                )
+              }})</v-card-title
             >
-          </div>
-          <v-divider light vertical inset class="mr-2"></v-divider>
-          <v-btn @click="getLobbyList()" x-small>
-            <v-icon color="green lighten-1">mdi-refresh</v-icon>
-            รีเฟรชรายชื่อ
-          </v-btn>
-        </v-system-bar>
-        <!-- </v-list-item> -->
-        <v-card
-          v-if="this.inviteList.length != 0"
-          max-height="500px"
-          class="overflow-auto"
-          elevation="0"
-        >
-          <v-simple-table>
-            <tbody>
-              <tr v-for="item in this.inviteList" :key="item.id">
-                <td>{{ item.id }}</td>
-                <td>{{ item.name }}</td>
-                <td>{{ item.status }}</td>
-                <td>
-                  <v-btn
-                    v-if="checkDelBtn(item.id)"
-                    icon
-                    @click="showDialogCfDel(item.id, item.name)"
-                  >
-                    <v-icon color="red lighten-1">mdi-minus-circle</v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-            </tbody>
-          </v-simple-table>
-          <!-- <v-list-item v-for="items in this.inviteList" :key="items.id">
+            <v-spacer></v-spacer>
+            <div>
+              รหัสเข้าร่วม: {{ this.code }}
+              <v-icon @click="copyToClipboard()" small color="orange lighten-1"
+                >mdi-content-copy</v-icon
+              >
+            </div>
+            <v-divider light vertical inset class="mr-2"></v-divider>
+            <v-btn @click="getLobbyList()" x-small>
+              <v-icon color="green lighten-1">mdi-refresh</v-icon>
+              รีเฟรชรายชื่อ
+            </v-btn>
+          </v-system-bar>
+          <!-- </v-list-item> -->
+          <v-card
+            v-if="this.inviteList.length != 0"
+            max-height="500px"
+            class="overflow-auto"
+            elevation="0"
+          >
+            <v-simple-table>
+              <tbody>
+                <tr v-for="item in this.inviteList" :key="item.id">
+                  <td>{{ item.id }}</td>
+                  <td>{{ item.name }}</td>
+                  <td>
+                    <v-icon
+                      v-if="item.status == 'Confirmed'"
+                      color="green"
+                      dense
+                      small
+                    >
+                      mdi-checkbox-marked-circle</v-icon
+                    ><v-icon
+                      v-else-if="item.status == 'Pending'"
+                      color="primary"
+                      dense
+                      small
+                    >
+                      mdi-timer-sand</v-icon
+                    >{{ item.status }}
+                  </td>
+                  <td>
+                    <v-btn
+                      v-if="checkDelBtn(item.id)"
+                      icon
+                      @click="showDialogCfDel(item.id, item.name)"
+                    >
+                      <v-icon color="red lighten-1">mdi-minus-circle</v-icon>
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </v-simple-table>
+            <!-- <v-list-item v-for="items in this.inviteList" :key="items.id">
             <v-list-item-content>
               <v-list-item-subtitle
                 >{{ items.id }} &ensp; {{ items.name }}</v-list-item-subtitle
@@ -150,22 +172,43 @@
               </v-btn>
             </v-list-item-action>
           </v-list-item> -->
+          </v-card>
+          <v-card v-else height="500px">
+            <v-card-text class="d-flex justify-center align-center"
+              >ไม่มีข้อมูล</v-card-text
+            >
+          </v-card>
         </v-card>
-        <v-card v-else height="500px">
-          <v-card-text class="d-flex justify-center align-center"
-            >ไม่มีข้อมูล</v-card-text
-          >
-        </v-card>
-      </v-card>
-    </v-col>
+      </v-col>
+      <v-col cols="6">
+        <CourtDetail
+          class="d-flex justify-center"
+          :selectedCourt="this.$store.state.selectedCourt"
+          :page="'confirm_booking'"
+        ></CourtDetail>
+      </v-col>
+    </v-row>
+    <v-row class="d-flex justify-end">
+      <v-btn class="mx-2" dark large color="red" width="auto"
+        >ยกเลิกการจอง</v-btn
+      >
+      <v-btn @click="sendRequest()" large color="primary" width="auto"
+        >ส่งคำขอการจองสนาม</v-btn
+      >
+    </v-row>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import CourtDetail from "@/components/CourtDetail.vue";
 export default {
+  components: {
+    CourtDetail,
+  },
   data() {
     return {
+      memberCount: 0,
       inputID: null,
       btnLoading: false,
       inviteList: [],
@@ -180,15 +223,25 @@ export default {
         displayname: "",
       },
       code: "",
+      interval: null,
+      user:{},
+      gg:null
     };
   },
   methods: {
     test() {
       console.log(this.$store.state.userId);
     },
+    sendRequest() {
+      // let check =
+      //   (this.userInfo.username != undefined) &
+      //   (this.$store.state.selectedCourt != "");
+      // if (check) {
+      // }
+    },
     checkDelBtn(x) {
       let g = this.inviteList.find((e) => e.id === x);
-      if (x == this.$store.state.userId) {
+      if (x == this.user.username) {
         return false;
       } else if (g.status == "Confirmed") {
         return false;
@@ -238,7 +291,7 @@ export default {
           userName: this.invitee.displayname,
           code: this.code,
           court: this.$store.state.selectedCourt,
-          courtName: this.$store.state.courtDetail.courtName,
+          courtName: this.$store.state.courtDetail.Name_th,
           time: this.$store.state.courtDetail.time,
         })
         .then((res) => {
@@ -309,11 +362,17 @@ export default {
     },
     createLobby() {
       let body = {
-        userId: this.$store.state.userId,
-        userName: this.$store.state.userName,
+        userId: this.user.username,
+        userName: this.user.displayname,
         court: this.$store.state.selectedCourt,
       };
-      if ((body.userId != "") & (body.court != "") & (body.userName != "")) {
+      console.log(body);
+
+      if (
+        (body.userId != undefined) &
+        (body.court != "") &
+        (body.userName != undefined)
+      ) {
         axios.post("http://localhost:4000/createList", body).then((res) => {
           this.code = res.data.code;
           this.getLobbyList();
@@ -328,9 +387,6 @@ export default {
         code: this.code,
         status: 0,
       };
-      // console.log(body);
-      // body.code ='QIbc5l';
-      // body.court ='01'
       if ((body.code != "") & (body.court != "")) {
         axios.post("http://localhost:4000/getLobbyData", body).then((res) => {
           // console.log(res,"resss");
@@ -343,33 +399,79 @@ export default {
             });
           }
           console.log(this.inviteList, "invitelist");
+          this.memberCount = this.inviteList.length;
         });
       } else {
         console.error("error occurred lb");
       }
     },
+    pollData() {
+      if (
+        (this.user.username ==
+          undefined & this.$store.state.selectedCourt & this.code)
+      ) {
+        this.interval = setInterval(() => {
+          this.getLobbyList();
+          console.log("getlb");
+        }, 5000);
+      }
+    },
+    cancelBook() {
+      if (this.$store.state.selectedCourt & this.code) {
+        axios
+          .delete("http://localhost:4000/cancelBook", {
+            data: {
+              court: this.$store.state.selectedCourt,
+              code: this.code,
+            },
+          })
+          .then(() => {
+            console.log("canceled");
+          });
+      }
+    },
+
+    // beforeWindowUnload(e) {
+    //   console.log("exitt");
+    //   const answer = window.confirm(
+    //     "การจองนี้จะถูกยกเลิกหากคุณออกจากหน้านี้ คุณยืนยันจะออกหรือไม่?"
+    //   );
+    //   if (!answer) {
+    //     // Cancel the event
+    //     e.preventDefault();
+    //     // Chrome requires returnValue to be set
+    //     e.returnValue = "";
+    //   }
+    // },
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.$auth.loggedIn == true) {
+      const answer = window.confirm(
+        "การจองนี้จะถูกยกเลิกหากคุณออกจากหน้านี้ คุณยืนยันจะออกหรือไม่?"
+      );
+      if (answer) {
+        this.cancelBook();
+        next();
+      } else {
+        next(false);
+      }
+    }
+  },
+  created() {
+    // window.addEventListener("beforeunload", this.beforeWindowUnload);
   },
   mounted() {
-    // let promise = new Promise((resolve, reject) => {
-    //   this.createLobby();
-    //   resolve();
-    // });
-    // promise.then(() => {
-    //   this.getLobbyList();
-    // });
+    this.user = this.$auth.$storage.getUniversal('user')
     this.createLobby();
-    console.log(this.$store.state.selectedCourt);
-    setInterval(() => {
-      this.getLobbyList();
-      console.log("getlb");
-    }, 5000);
+    this.pollData();
+    
   },
-  destroyed() {
+  beforeDestroy() {
     console.log("TEST");
+    clearInterval(this.interval);
   },
 };
 </script>
 
 <style>
-  
 </style>

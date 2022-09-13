@@ -56,7 +56,6 @@
     <v-divider></v-divider>
 
     <CourtDetail
-      :court="this.court"
       :selectedCourt="selectedCourt"
       :page="'timetable'"
     />
@@ -248,6 +247,7 @@ export default {
   },
   mounted() {
     console.log(this.court);
+    this.$store.state.courtDetail.time = null
     // console.log("mmmmmm"+this.listCourt);
     // this.API();
   },

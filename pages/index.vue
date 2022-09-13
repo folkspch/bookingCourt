@@ -8,6 +8,11 @@
   </v-col>
 </div> 
 </template>
+<script>
+export default {
+  middleware: 'auth'
+}
+</script>
 <style scoped>
   *{
     color:black;

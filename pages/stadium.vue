@@ -91,6 +91,7 @@ export default {
   },
   mounted() {
     this.API();
+    this.$store.state.courtDetail.time = null
   },
 };
 </script>

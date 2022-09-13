@@ -117,8 +117,17 @@
           </v-card>
         </v-col>
         <v-col cols="6">
-          <div v-if="this.selectedCourt&&this.selectedTime">
-            <v-btn @click="setSelectedCourt()" large bottom right absolute color="success" width="10%" >ต่อไป</v-btn>
+          <div v-if="this.selectedCourt && this.selectedTime">
+            <v-btn
+              @click="setSelectedCourt()"
+              large
+              bottom
+              right
+              absolute
+              color="primary"
+              width="10%"
+              >ต่อไป</v-btn
+            >
           </div>
         </v-col>
       </v-row>
@@ -187,13 +196,16 @@ export default {
         console.log("temp ", this.temp);
       });
     },
-    setSelectedCourt(){
-      let data = {
-        courtName: this.court.find((e) => e.Court_id === this.selectedCourt).Name_th,
-        time:this.selectedTime[0]+"-"+this.selectedTime[1]
-      }
-      this.$store.commit("setSelectedCourt",this.selectedCourt)
-      this.$store.commit("setCourtDetail",data)
+    setSelectedCourt() {
+      let data = this.court.find(
+        (e) => e.Court_id === this.selectedCourt
+      )
+      data.time = this.selectedTime[0]+"-"+this.selectedTime[1]
+      // time:this.selectedTime[0]+"-"+this.selectedTime[1]
+      // console.log(data,"dataaaa")
+      this.$store.commit("setSelectedCourt", this.selectedCourt);
+      this.$store.commit("setCourtDetail", data);
+      console.log(this.$store.state.courtDetail)
       this.$router.replace('/confirm_booking');
     },
     isInRange(value, range) {

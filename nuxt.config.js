@@ -40,10 +40,41 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/auth-next'
   ],
+  auth: {
+    redirect: {
+      login: '/login',
+      logout: '/login',
+      callback: '/login',
+    },
+    strategies: {
+      local: {
+        token: {
+          required: false,
+          type: false,
+          maxAge:2592000
+        }, 
+        endpoints: {
+          login: {
+            headers: { 'Authorization': 'Bearer jnNJKFFN9-X55FNmqmLazn1B47BlYmw7' },
+            url: 'user-authen',
+            method: 'post',
+            propertyName: 'data.userInfo'
+          },
+          logout:false,
+          user:false
+        },
+      }
+    }
+  },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {},
+  axios: {
+    baseURL: 'https://cors-anywhere.herokuapp.com/https://api.account.kmutnb.ac.th/api/account-api',
+
+    // credentials: true
+  },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
