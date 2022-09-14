@@ -86,6 +86,7 @@
 <script>
 import axios from "axios";
 export default {
+  layout: 'loginLayout',
   data() {
     return {
       show1: false,
@@ -106,26 +107,30 @@ export default {
               data: {
                 username: this.user,
                 password: this.password,
-                scopes: "personel,student,templecturer,exchange_student",
               },
             })
-            // .then((response) => {
-            //   console.log(response)
-            //   if (response.data.api_status == "fail") {
-            //     this.dialogError = true;
-            //     console.log("wrong pass");
-
-            //   } else if (response.data.api_status == "success") {
-            //     this.$router.replace({ name: "index" });
-            //     this.$auth.setUser(response.data.userInfo);
-            //     this.$auth.$storage.setUniversal(
-            //       "user",
-            //       response.data.userInfo,
-            //       true
-            //     );
-            //   }
-            //   this.loading = false;
-            // });
+            .then((response) => {
+              console.log('sfsfsdfsdfs');
+              // console.log(response)
+              // if (response.data.message == "Invalid credentials") {
+                
+              //   console.log("wrong pass");
+              // } 
+              // else if (response.data.api_status == "success") {
+              //   this.$router.replace({ name: "index" });
+              //   this.$auth.setUser(response.data.userInfo);
+              //   this.$auth.$storage.setUniversal(
+              //     "user",
+              //     response.data.userInfo,
+              //     true
+              //   );
+              // }
+              this.loading = false;
+            }).catch((err)=>{
+              console.log(err,'errrrrror');
+              this.dialogError = true;
+              this.loading = false;
+            });
           // console.log(response);
 
           // if (response.data.success) {

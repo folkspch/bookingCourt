@@ -3,8 +3,8 @@ import colors from 'vuetify/es5/util/colors'
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - bookingCourt',
-    title: 'bookingCourt',
+    titleTemplate: '%s - KMUTNB',
+    title: 'ระบบจองสนามกีฬาตึก 40',
     htmlAttrs: {
       lang: 'en'
     },
@@ -42,11 +42,15 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth-next'
   ],
+  router: {
+    middleware: ['auth']
+  },
   auth: {
     redirect: {
       login: '/login',
       logout: '/login',
       callback: '/login',
+      home:'/'
     },
     strategies: {
       local: {
@@ -57,10 +61,8 @@ export default {
         }, 
         endpoints: {
           login: {
-            headers: { 'Authorization': 'Bearer jnNJKFFN9-X55FNmqmLazn1B47BlYmw7' },
-            url: 'user-authen',
+            url: 'http://localhost:4000/login',
             method: 'post',
-            propertyName: 'data.userInfo'
           },
           logout:false,
           user:false
@@ -71,8 +73,6 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: 'https://cors-anywhere.herokuapp.com/https://api.account.kmutnb.ac.th/api/account-api',
-
     // credentials: true
   },
 
