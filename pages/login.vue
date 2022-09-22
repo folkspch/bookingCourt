@@ -9,7 +9,7 @@
           transition="scale-transition"
           type="error"
         >
-          ชื่อผู้ใช้หรือรหัสผ่านผิด โปรดตรวจสอบและลองอีกครั้ง
+          {{ this.errorMsg }}
         </v-alert>
         <v-img
           contain
@@ -86,7 +86,7 @@
 <script>
 import axios from "axios";
 export default {
-  layout: 'loginLayout',
+  layout: "loginLayout",
   data() {
     return {
       show1: false,
@@ -95,6 +95,7 @@ export default {
       userInfo: {},
       loading: false,
       dialogError: false,
+      errorMsg: "",
     };
   },
   methods: {
@@ -110,84 +111,41 @@ export default {
               },
             })
             .then((response) => {
-              console.log('sfsfsdfsdfs');
+              console.log(response.data.userInfo);
               // console.log(response)
               // if (response.data.message == "Invalid credentials") {
-                
+
               //   console.log("wrong pass");
-              // } 
+              // }
               // else if (response.data.api_status == "success") {
               //   this.$router.replace({ name: "index" });
-              //   this.$auth.setUser(response.data.userInfo);
-              //   this.$auth.$storage.setUniversal(
-              //     "user",
-              //     response.data.userInfo,
-              //     true
-              //   );
+              this.$auth.setUser(response.data.userInfo);
+              let user = {
+                username: response.data.userInfo.username,
+                displayname: response.data.userInfo.displayname,
+              };
+              this.$auth.$storage.setUniversal("user", user, true);
               // }
               this.loading = false;
-            }).catch((err)=>{
-              console.log(err,'errrrrror');
-              this.dialogError = true;
+            })
+            .catch((err) => {
+              if (err.response.data.message == "Invalid credentials") {
+                this.errorMsg =
+                  "ชื่อผู้ใช้หรือรหัสผ่านผิด โปรดตรวจสอบและลองอีกครั้ง";
+                this.dialogError = true;
+              } else {
+                this.errorMsg = "มีข้อผิดพลาดเกิดขึ้น โปรดลองอีกครั้งภายหลัง";
+                this.dialogError = true;
+              }
               this.loading = false;
             });
-          // console.log(response);
-
-          // if (response.data.success) {
-          //   this.$router.replace({ name: 'blogs' })
-          // }
         } catch (err) {
+          this.errorMsg = "มีข้อผิดพลาดเกิดขึ้น โปรดลองอีกครั้งภายหลัง";
+          this.dialogError = true;
           this.loading = false;
           console.log(err);
         }
-        // console.log(this.$auth);
       }
-
-      // let token = "jnNJKFFN9-X55FNmqmLazn1B47BlYmw7";
-      // const config = {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // };
-      // let body = {
-      //   username: this.user,
-      //   password: this.password,
-      //   scopes: "personel,student,templecturer,exchange_student",
-      // };
-      // if (this.user && this.password) {
-      //   this.loading = true;
-      //   axios
-      //     .post(
-      //       "https://cors-anywhere.herokuapp.com/https://api.account.kmutnb.ac.th/api/account-api/user-authen",
-      //       body,
-      //       config
-      //     )
-      //     .then((res) => {
-      //       console.log(res,"resppp")
-      //       this.userInfo = res.data.userInfo;
-      //       console.log(this.userInfo, "userinfo");
-      //       if (res.data.api_status == "success") {
-      //         this.$store.commit("setUserName", this.userInfo.displayname);
-      //         this.$store.commit("setUserId", this.userInfo.username);
-      //         console.log(this.$store.state);
-      //         if (this.remember) {
-      //           let now = new Date();
-      //           let time = now.getTime();
-      //           let expireTime = time + 86400000 * 30;
-      //           now.setTime(expireTime);
-      //           document.cookie =
-      //             `Uid=${this.userInfo.username};expires=` +
-      //             now.toUTCString() + expireTime
-      //             ";path=/";
-      //         }
-      //         this.$router.replace("/");
-      //       } else if (res.data.api_status == "fail") {
-      //         this.dialogError = true;
-      //         console.log("wrong");
-      //       }
-      //       this.loading = false;
-      //     });
-      // } else {
-      //   console.log("dsfsdfsdf");
-      // }
     },
   },
 };

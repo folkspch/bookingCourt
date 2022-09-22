@@ -21,14 +21,15 @@
       </v-row>
       <v-list>
         <!-- <div class="d-flex justify-center mb-3"></div> -->
-        <!-- <v-list-item>
+        <v-list-item>
         <v-list-item-action>
-          <v-icon color="primary">mdi-account</v-icon>
+          <v-icon color="orange lighten-4">mdi-account</v-icon>
         </v-list-item-action>
         <v-list-item-content>
+          <v-list-item-title v-text="this.userInfo.username" />
           <v-list-item-title v-text="this.userInfo.displayname" />
         </v-list-item-content>
-      </v-list-item> -->
+      </v-list-item>
         <v-list-item
           v-for="(item, i) in items"
           :key="i"

@@ -23,7 +23,7 @@
           </p>
           <p>
             จำนวนผู้เล่นขั้นต่ำ :
-            {{ this.court[parseInt(selectedCourt) - 1].Description_th }}
+            {{ this.court[parseInt(selectedCourt) - 1].Players }} คน
           </p>
           <p v-if="$store.state.courtDetail.time">
             ช่วงเวลาที่ต้องการจอง :

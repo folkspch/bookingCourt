@@ -66,11 +66,23 @@
       <v-card>
         <v-card-title>{{ this.errorText.title }}</v-card-title>
         <v-card-text>
-          {{ this.errorText.text }} {{ this.inputID }}
+          {{ this.errorText.text }}
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn @click="dialogError = false">ตกลง</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialogCancel">
+      <v-card>
+        <v-card-title>ยืนยันการยกเลิก</v-card-title>
+        <v-card-text> คุณต้องการยกเลิกการจองนี้หรือไม่? </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="error" @click="cancelBook(true)">ตกลง</v-btn>
+          <v-btn @click="dialogCancel = false">ยกเลิก</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -97,9 +109,7 @@
           <v-system-bar window>
             <v-card-title
               >รายชื่อผู้เข้าร่วมการจอง ({{ this.memberCount }}/{{
-                parseInt(
-                  this.$store.state.courtDetail.Description_th.substring(0, 2)
-                )
+                this.$store.state.courtDetail.Players
               }})</v-card-title
             >
             <v-spacer></v-spacer>
@@ -188,14 +198,30 @@
         ></CourtDetail>
       </v-col>
     </v-row>
-    <v-row class="d-flex justify-end">
+    <!-- <v-row class="d-flex justify-end">
       <v-btn class="mx-2" dark large color="red" width="auto"
         >ยกเลิกการจอง</v-btn
       >
       <v-btn @click="sendRequest()" large color="primary" width="auto"
         >ส่งคำขอการจองสนาม</v-btn
       >
-    </v-row>
+    </v-row> -->
+    <v-footer absolute class="mb-5" color="white">
+      <v-row class="d-flex justify-end">
+        <v-btn
+          @click="dialogCancel = true"
+          class="mx-2"
+          dark
+          large
+          color="red"
+          width="auto"
+          >ยกเลิกการจอง</v-btn
+        >
+        <v-btn @click="sendRequest()" large color="primary" width="auto"
+          >ส่งคำขอการจองสนาม</v-btn
+        >
+      </v-row>
+    </v-footer>
   </div>
 </template>
 
@@ -216,6 +242,7 @@ export default {
       dialogError: false,
       dialogConfirmDel: false,
       dialogEmail: false,
+      dialogCancel: false,
       errorText: { title: "", text: "" },
       delUser: { id: "", name: "" },
       invitee: {
@@ -224,8 +251,8 @@ export default {
       },
       code: "",
       interval: null,
-      user:{},
-      gg:null
+      user: {},
+      confirmExit: false,
     };
   },
   methods: {
@@ -233,11 +260,26 @@ export default {
       console.log(this.$store.state.userId);
     },
     sendRequest() {
-      // let check =
-      //   (this.userInfo.username != undefined) &
-      //   (this.$store.state.selectedCourt != "");
-      // if (check) {
-      // }
+      console.log(this.user);
+      let check =
+        (this.user.username != undefined) &
+        (this.$store.state.selectedCourt != "");
+
+      if (this.$store.state.courtDetail.Player_strict) {
+        if (this.memberCount < this.$store.state.courtDetail.Players) {
+          this.errorText = {
+            title: "ผู้เล่นไม่ครบตามเกณฑ์",
+            text: "สนามนี้จำเป็นต้องมีผู้เล่นครบตามกำหนด",
+          };
+          this.dialogError = true;
+          check = false;
+          return;
+        }
+      }
+
+      // console.log(this.$store.state.courtDetail);
+      if (check) {
+      }
     },
     checkDelBtn(x) {
       let g = this.inviteList.find((e) => e.id === x);
@@ -311,7 +353,7 @@ export default {
         var isDulplicate = this.inviteList.find((e) => e.id === this.inputID);
         if (isDulplicate) {
           this.errorText.title = "รหัสซ้ำ";
-          this.errorText.text = "รหัสนี้มีอยู่แล้ว";
+          this.errorText.text = `รหัส ${this.inputID} มีอยู่แล้ว`;
           this.dialogError = true;
           // this.btnLoading = false;
           return;
@@ -387,7 +429,7 @@ export default {
         code: this.code,
         status: 0,
       };
-      if ((body.code != "") & (body.court != "")) {
+      if (body.code != "" && body.court != "") {
         axios.post("http://localhost:4000/getLobbyData", body).then((res) => {
           // console.log(res,"resss");
           this.inviteList = [];
@@ -406,18 +448,17 @@ export default {
       }
     },
     pollData() {
-      if (
-        (this.user.username ==
-          undefined & this.$store.state.selectedCourt & this.code)
-      ) {
+      if (this.user.username != undefined && this.$store.state.selectedCourt) {
         this.interval = setInterval(() => {
-          this.getLobbyList();
-          console.log("getlb");
+          if (this.code) {
+            this.getLobbyList();
+            console.log("getlb");
+          }
         }, 5000);
       }
     },
-    cancelBook() {
-      if (this.$store.state.selectedCourt & this.code) {
+    cancelBook(btn) {
+      if (this.$store.state.selectedCourt && this.code) {
         axios
           .delete("http://localhost:4000/cancelBook", {
             data: {
@@ -428,6 +469,10 @@ export default {
           .then(() => {
             console.log("canceled");
           });
+      }
+      this.confirmExit = true;
+      if (btn) {
+        this.$router.replace("/booking");
       }
     },
 
@@ -446,14 +491,17 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     if (this.$auth.loggedIn == true) {
-      const answer = window.confirm(
-        "การจองนี้จะถูกยกเลิกหากคุณออกจากหน้านี้ คุณยืนยันจะออกหรือไม่?"
-      );
-      if (answer) {
-        this.cancelBook();
+      if (this.confirmExit) {
         next();
       } else {
-        next(false);
+        if (
+          window.confirm(
+            "การจองนี้จะถูกยกเลิกหากคุณออกจากหน้านี้ คุณยืนยันจะออกหรือไม่?"
+          )
+        ) {
+          this.cancelBook();
+          next();
+        }
       }
     }
   },
@@ -461,10 +509,9 @@ export default {
     // window.addEventListener("beforeunload", this.beforeWindowUnload);
   },
   mounted() {
-    this.user = this.$auth.$storage.getUniversal('user')
+    this.user = this.$auth.$storage.getUniversal("user");
     this.createLobby();
     this.pollData();
-    
   },
   beforeDestroy() {
     console.log("TEST");

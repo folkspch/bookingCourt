@@ -61,7 +61,7 @@
         <v-row>
           <v-select
             v-model="selectedTime"
-            :items="OpsTime.ArrTime"
+            :items="timeChoice"
             item-text="TimeForShow"
             item-value="Time"
             solo
@@ -95,10 +95,8 @@
                   </p>
                   <p>
                     จำนวนผู้เล่นขั้นต่ำ :
-                    {{
-                      this.court[parseInt(this.selectedCourt) - 1]
-                        .Description_th
-                    }}
+                    {{ this.court[parseInt(this.selectedCourt) - 1].Players }}
+                    คน
                   </p>
                   <p>
                     ช่วงเวลาที่ต้องการจอง :
@@ -132,6 +130,7 @@
         </v-col>
       </v-row>
     </div>
+    <!-- <v-btn @click="filterTime()">GG</v-btn> -->
   </div>
 </template>
 
@@ -160,8 +159,7 @@ export default {
     return {
       court: [
         {
-          Description_en: "",
-          Description_th: "",
+          Players: "",
           Id: "",
           Img: "",
           Name_en: "",
@@ -178,35 +176,20 @@ export default {
       table: [],
       plotStatus: 0,
       countSlot: 0,
+      timeChoice: [],
     };
   },
 
   methods: {
-    // print(){
-    //   let temp = document.getElementById('gg');
-    //   console.log(temp)
-    // },
-    test() {
-      const options = {
-        url: `http://localhost:4000/getRules`,
-        method: "GET",
-      };
-      this.$axios(options).then((res) => {
-        this.temp = res.data;
-        console.log("temp ", this.temp);
-      });
-    },
     setSelectedCourt() {
-      let data = this.court.find(
-        (e) => e.Court_id === this.selectedCourt
-      )
-      data.time = this.selectedTime[0]+"-"+this.selectedTime[1]
+      let data = this.court.find((e) => e.Court_id === this.selectedCourt);
+      data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
       // time:this.selectedTime[0]+"-"+this.selectedTime[1]
       // console.log(data,"dataaaa")
       this.$store.commit("setSelectedCourt", this.selectedCourt);
       this.$store.commit("setCourtDetail", data);
-      console.log(this.$store.state.courtDetail)
-      this.$router.replace('/confirm_booking');
+      console.log(this.$store.state.courtDetail);
+      this.$router.replace("/confirm_booking");
     },
     isInRange(value, range) {
       if (this.plotStatus == 1) {
@@ -260,19 +243,14 @@ export default {
           }
         }
         this.countSlot = OpsHour;
+        this.filterTime();
       });
       this.setOpTime();
     },
     setOpTime() {
+      console.log('SET')
       this.OpsTime.ArrTime = [];
       this.selectedTime = null;
-      // const options = {
-      //   url: `http://localhost:4000/getOpTime/${this.selectedCourt}`,
-      //   method: "GET",
-      // };
-      // this.court[parseInt(this.selectedCourt)].TimeOpen
-      // this.$axios(options).then((res) => {
-      // var temp = res.data;
       this.OpsTime.OpenTime = parseInt(
         this.court[parseInt(this.selectedCourt) - 1].TimeOpen.substring(0, 2)
       );
@@ -289,16 +267,25 @@ export default {
         });
       }
       console.log(this.OpsTime.ArrTime, "ArrTime");
-      // console.log("Time ",this.OpsTime.OpenTime, this.OpsTime.CloseTime);
-      // });
-      // this.timeOpen = parseInt(this.timeOpen.substring(0, 2))
-      // console.log("Time ",this.timeOpen,this.timeClose)
+      
+    },
+    filterTime() {
+      this.timeChoice = [...this.OpsTime.ArrTime];
+      let temp = [];
+      for (let i = 0; i < this.table.length; i++) {
+        temp.push(this.table[i].Time_Start);
+      }
+      let Timefilter = this.timeChoice.filter(function (e) {
+        if (temp.indexOf(e.Time[0]) > -1) {
+          return false;
+        }
+        return true;
+      });
+      this.timeChoice = [...Timefilter]
     },
   },
   mounted() {
     console.log(this.court);
-    // console.log("mmmmmm"+this.listCourt);
-    // this.API();
   },
 };
 </script>

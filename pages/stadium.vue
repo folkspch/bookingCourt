@@ -35,7 +35,7 @@
                 <p>สถานที่ตั้ง : {{ this.data[selectedID].Place_th }}</p>
                 <p>
                   จำนวนผู้เล่นที่อนุญาตให้จอง :
-                  {{ this.data[selectedID].Description_th }}
+                  {{ this.data[selectedID].Players }} คน
                 </p>
                 <p>
                   เวลาเปิด :
@@ -62,8 +62,7 @@ export default {
       pic: "https://cdn2.iconfinder.com/data/icons/pretty-office-part-7/256/football_pitch-512.png",
       data: [
         {
-          Description_en: "",
-          Description_th: "",
+          Players: "",
           Id: "",
           Img: "",
           Name_en: "",

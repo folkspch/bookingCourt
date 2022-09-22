@@ -100,8 +100,7 @@ export default {
     return {
       court: [
         {
-          Description_en: "",
-          Description_th: "",
+          Players: "",
           Id: "",
           Img: "",
           Name_en: "",
