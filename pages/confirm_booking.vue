@@ -108,9 +108,11 @@
           <!-- <v-list-item> -->
           <v-system-bar window>
             <v-card-title
-              >รายชื่อผู้เข้าร่วมการจอง ({{ this.memberCount }}/{{
+              >รายชื่อผู้เข้าร่วมการจอง 
+              ({{ this.inviteList.length }}/{{
                 this.$store.state.courtDetail.Players
-              }})</v-card-title
+              }})
+              </v-card-title
             >
             <v-spacer></v-spacer>
             <div>
@@ -163,6 +165,12 @@
                       <v-icon color="red lighten-1">mdi-minus-circle</v-icon>
                     </v-btn>
                   </td>
+                </tr>
+                <tr style="background-color:#E0E0E0">
+                  <td></td>
+                  <td></td>
+                  <td>ยืนยันแล้ว {{this.memberCount}} คน</td>
+                  <td></td>
                 </tr>
               </tbody>
             </v-simple-table>
@@ -276,9 +284,10 @@ export default {
           return;
         }
       }
-
+      // มีชื่อในสนามอื่นไหม,คนครบไหม,สนามว่างไหม
       // console.log(this.$store.state.courtDetail);
       if (check) {
+        
       }
     },
     checkDelBtn(x) {
@@ -441,7 +450,12 @@ export default {
             });
           }
           console.log(this.inviteList, "invitelist");
-          this.memberCount = this.inviteList.length;
+          this.memberCount=0
+          for(let i=0;i<this.inviteList.length;i++){
+            if(this.inviteList[i].status=='Confirmed'||this.inviteList[i].status=='Host'){
+              this.memberCount++
+            }
+          }
         });
       } else {
         console.error("error occurred lb");
