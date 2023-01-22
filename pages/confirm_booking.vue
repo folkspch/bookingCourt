@@ -107,7 +107,7 @@
         <v-card>
           <!-- <v-list-item> -->
           <v-system-bar window>
-            <v-card-title
+            <v-card-title style="font-size: 100%;"
               >รายชื่อผู้เข้าร่วมการจอง 
               ({{ this.inviteList.length }}/{{
                 this.$store.state.courtDetail.Players
@@ -201,6 +201,7 @@
       <v-col cols="6">
         <CourtDetail
           class="d-flex justify-center"
+          :Court="this.court"
           :selectedCourt="this.$store.state.selectedCourt"
           :page="'confirm_booking'"
         ></CourtDetail>
@@ -237,6 +238,13 @@
 import axios from "axios";
 import CourtDetail from "@/components/CourtDetail.vue";
 export default {
+  async asyncData({ params }) {
+    const code = params.code;
+    const court = params.court;
+
+    console.log(court,code);
+    return { code,court };
+  },
   components: {
     CourtDetail,
   },
@@ -257,7 +265,8 @@ export default {
         username: "",
         displayname: "",
       },
-      code: "",
+      code: null,
+      court: null,
       interval: null,
       user: {},
       confirmExit: false,
@@ -434,7 +443,7 @@ export default {
     },
     getLobbyList() {
       let body = {
-        court: this.$store.state.selectedCourt,
+        court: "02",
         code: this.code,
         status: 0,
       };
@@ -524,7 +533,12 @@ export default {
   },
   mounted() {
     this.user = this.$auth.$storage.getUniversal("user");
-    this.createLobby();
+    if(!this.code){
+      this.createLobby();
+    }
+    else{
+      this.getLobbyList()
+    }
     this.pollData();
   },
   beforeDestroy() {

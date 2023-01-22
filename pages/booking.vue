@@ -1,16 +1,40 @@
 <template>
   <div>
-    <v-col class="d-flex" cols="12" sm="6">
-      <v-select
-        label="กรุณาเลือกสนามที่ต้องการจอง"
-        v-model="selectedCourt"
-        :items="court"
-        item-text="Name_th"
-        item-value="Court_id"
-        @change="plotTable()"
-        solo
-      ></v-select>
-    </v-col>
+    <v-row class="d-flex">
+      <v-col cols="5">
+        <v-select
+          label="กรุณาเลือกสนามที่ต้องการจอง"
+          v-model="selectedCourt"
+          :items="court"
+          item-text="Name_th"
+          item-value="Court_id"
+          @change="plotTable()"
+          solo
+        ></v-select>
+      </v-col>
+      <div class="mt-7 px-5">หรือ</div>
+      <v-col cols="6">
+        <v-row no-gutters class="d-flex">
+          <v-col cols="">
+            <v-text-field
+              v-model="invite_code"
+              solo
+              placeholder="กรอกรหัสเข้าร่วมการจอง"
+              label="กรอกรหัสเข้าร่วมการจอง"
+            >
+              <v-icon slot="append" @click="paste()">
+                mdi-content-paste
+              </v-icon>
+            </v-text-field>
+          </v-col>
+          <v-col>
+            <v-btn @click="joinByCode()" color="primary" height="48px"
+              >เข้าร่วม</v-btn
+            >
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
     <v-simple-table v-if="this.selectedCourt" class="mb-5">
       <template v-slot:default>
         <thead>
@@ -131,6 +155,16 @@
       </v-row>
     </div>
     <!-- <v-btn @click="filterTime()">GG</v-btn> -->
+    <v-dialog v-model="dialog" persistent>
+      <v-card>
+        <v-card-title>ไม่พบรหัสเข้าร่วม</v-card-title>
+        <v-card-text> โปรดตรวจสอบรหัสเข้าร่วมและลองอีกครั้ง </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="error" @click="dialog = false">ตกลง</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -177,6 +211,8 @@ export default {
       plotStatus: 0,
       countSlot: 0,
       timeChoice: [],
+      invite_code: null,
+      dialog: false,
     };
   },
 
@@ -248,7 +284,7 @@ export default {
       this.setOpTime();
     },
     setOpTime() {
-      console.log('SET')
+      console.log("SET");
       this.OpsTime.ArrTime = [];
       this.selectedTime = null;
       this.OpsTime.OpenTime = parseInt(
@@ -267,7 +303,6 @@ export default {
         });
       }
       console.log(this.OpsTime.ArrTime, "ArrTime");
-      
     },
     filterTime() {
       this.timeChoice = [...this.OpsTime.ArrTime];
@@ -281,7 +316,33 @@ export default {
         }
         return true;
       });
-      this.timeChoice = [...Timefilter]
+      this.timeChoice = [...Timefilter];
+    },
+    joinByCode() {
+      if (this.invite_code && this.invite_code.length >= 6) {
+        axios
+          .post("http://localhost:4000/joinFromCode", {
+            code: this.invite_code,
+            userName: "s6104062630508",
+          })
+          .then((res) => {
+            if (res.data.length != 0) {
+              this.$router.push({
+                name: "confirm_booking",
+                params: {
+                  code : res.data[0].Code,
+                  court : res.data[0].Court
+                },
+              });
+            } else {
+                this.dialog = true;
+              return;
+            }
+          });
+      }
+    },
+    async paste() {
+      this.invite_code = await navigator.clipboard.readText();
     },
   },
   mounted() {

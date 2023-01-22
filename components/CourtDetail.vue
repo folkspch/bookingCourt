@@ -13,17 +13,17 @@
       <div class="mx-auto">
         <v-card-text >
           <p>
-            ชื่อสนาม : {{ this.court[parseInt(selectedCourt) - 1].Name_th }}
+            ชื่อสนาม : {{ this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Name_th }}
           </p>
           <p>
-            ชนิดสนามกีฬา : {{ this.court[parseInt(selectedCourt) - 1].Type_th }}
+            ชนิดสนามกีฬา : {{ this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Type_th }}
           </p>
           <p>
-            สถานที่ตั้ง : {{ this.court[parseInt(selectedCourt) - 1].Place_th }}
+            สถานที่ตั้ง : {{ this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Place_th }}
           </p>
           <p>
             จำนวนผู้เล่นขั้นต่ำ :
-            {{ this.court[parseInt(selectedCourt) - 1].Players }} คน
+            {{ this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Players }} คน
           </p>
           <p v-if="$store.state.courtDetail.time">
             ช่วงเวลาที่ต้องการจอง :
@@ -33,7 +33,7 @@
       </div>
       <v-img
         :max-width="this.mw"
-        :src="this.court[parseInt(selectedCourt) - 1].Img"
+        :src="this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Img"
       >
       </v-img>
       <!-- {{selectedID}} -->
@@ -50,10 +50,11 @@ export default {
       mw: "500px",
       classPage: "",
       court:[],
+      COURT:null
     };
   },
-
   props: {
+    Court: String,
     selectedCourt: String,
     page: String,
   },
@@ -63,11 +64,17 @@ export default {
         .get("http://localhost:4000/getCourtData")
         .then((res) => {
           this.court=res.data
-          console.log(this.court,"thiscourttt")
+          // console.log(this.court,"thiscourttt")
         });
     },
   },
   mounted() {
+    if(!this.selectedCourt){
+      this.COURT = this.court
+    }
+    else{
+      this.COURT = this.selectedCourt
+    }
     if (this.page === "timetable") {
       this.classPage = "mx-auto d-flex mt-5";
       this.mw = "200px";

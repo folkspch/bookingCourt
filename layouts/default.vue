@@ -68,7 +68,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer> -->
-    <v-footer :absolute="!fixed" app>
+    <v-footer fixed app>
       <span>KMUTNB &copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
   </v-app>

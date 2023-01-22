@@ -24,40 +24,43 @@
             <v-card width="30%" flat color="transparent">
               <v-card-title> เข้าสู่ระบบ </v-card-title>
               <v-card-subtitle> เข้าสู่ระบบโดยใช้บัญชี ICIT </v-card-subtitle>
-              <v-card-text>
-                <v-text-field color="orange" v-model="user" label="USERNAME"
-                  ><v-icon slot="prepend" color="orange">
-                    mdi-account
-                  </v-icon></v-text-field
-                >
+              <v-form>
+                <v-card-text>
+                  <v-text-field color="orange" v-model="user" label="USERNAME"
+                    ><v-icon slot="prepend" color="orange">
+                      mdi-account
+                    </v-icon></v-text-field
+                  >
 
-                <v-text-field
-                  color="orange"
-                  v-model="password"
-                  v-on:keyup.enter="authen()"
-                  :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                  :type="show1 ? 'text' : 'password'"
-                  label="PASSWORD"
-                  @click:append="show1 = !show1"
-                  ><v-icon slot="prepend" color="orange">
-                    mdi-lock
-                  </v-icon></v-text-field
-                >
-                <!-- <v-checkbox v-model="remember" label="จดจำฉันไว้?"></v-checkbox> -->
-                <div class="d-flex justify-center align-center">
-                  <v-btn
-                    @click="authen()"
-                    :disabled="this.loading"
-                    :loading="this.loading"
-                    color="primary"
-                    >LOGIN</v-btn
+                  <v-text-field
+                    clearable
+                    color="orange"
+                    v-model="password"
+                    v-on:keyup.enter="authen()"
+                    :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                    :type="show1 ? 'text' : 'password'"
+                    label="PASSWORD"
+                    @click:append="show1 = !show1"
+                    ><v-icon slot="prepend" color="orange">
+                      mdi-lock
+                    </v-icon></v-text-field
                   >
-                  <v-divider class="mx-3" vertical light></v-divider>
-                  <a href="https://account.kmutnb.ac.th/web/recovery/index"
-                    >ลืมรหัสผ่าน?</a
-                  >
-                </div>
-              </v-card-text>
+                  <!-- <v-checkbox v-model="remember" label="จดจำฉันไว้?"></v-checkbox> -->
+                  <div class="d-flex justify-center align-center">
+                    <v-btn
+                      @click="authen()"
+                      :disabled="this.loading"
+                      :loading="this.loading"
+                      color="primary"
+                      >LOGIN</v-btn
+                    >
+                    <v-divider class="mx-3" vertical light></v-divider>
+                    <a href="https://account.kmutnb.ac.th/web/recovery/index"
+                      >ลืมรหัสผ่าน?</a
+                    >
+                  </div>
+                </v-card-text>
+              </v-form>
             </v-card>
           </v-col>
           <!-- </v-row> -->
@@ -133,6 +136,9 @@ export default {
                 this.errorMsg =
                   "ชื่อผู้ใช้หรือรหัสผ่านผิด โปรดตรวจสอบและลองอีกครั้ง";
                 this.dialogError = true;
+                setTimeout(() => {
+                  this.dialogError = false;
+                }, 2100);
               } else {
                 this.errorMsg = "มีข้อผิดพลาดเกิดขึ้น โปรดลองอีกครั้งภายหลัง";
                 this.dialogError = true;
@@ -145,6 +151,13 @@ export default {
           this.loading = false;
           console.log(err);
         }
+      } else {
+        this.errorMsg = "โปรดกรอกข้อมูลให้ครบทุกช่อง";
+        this.dialogError = true;
+        this.loading = false;
+        setTimeout(() => {
+          this.dialogError = false;
+        }, 1600);
       }
     },
   },
