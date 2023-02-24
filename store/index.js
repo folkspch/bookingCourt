@@ -9,11 +9,19 @@ export default () => new Vuex.Store({
     userId:'',
     userName:'',
     selectedCourt:'',
+    selectedTime:{
+      time_start:null,
+      time_end:null
+    },
     courtDetail:{}
   }),
   mutations: {
     setSelectedCourt(state,value){
       state.selectedCourt=value
+    },
+    setSelectedTime(state,value){
+      state.selectedTime.time_start=value[0]
+      state.selectedTime.time_end=value[1]
     },
     setUserId(state,value){
       state.userId=value

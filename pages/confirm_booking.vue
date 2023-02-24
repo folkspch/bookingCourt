@@ -425,13 +425,17 @@ export default {
         userId: this.user.username,
         userName: this.user.displayname,
         court: this.$store.state.selectedCourt,
+        time_start: this.$store.state.selectedTime.time_start,
+        time_end: this.$store.state.selectedTime.time_end,
       };
       console.log(body);
 
       if (
         (body.userId != undefined) &
         (body.court != "") &
-        (body.userName != undefined)
+        (body.userName != undefined) &
+        (body.time_start != null) &
+        (body.time_end != null)
       ) {
         axios.post("http://localhost:4000/createList", body).then((res) => {
           this.code = res.data.code;
@@ -442,8 +446,15 @@ export default {
       }
     },
     getLobbyList() {
+      let court
+      if(this.$store.state.selectedCourt){
+        court = this.$store.state.selectedCourt
+      }
+      else{
+        court = this.court
+      }
       let body = {
-        court: "02",
+        court: court,
         code: this.code,
         status: 0,
       };

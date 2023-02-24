@@ -64,6 +64,10 @@ export default {
         .get("http://localhost:4000/getCourtData")
         .then((res) => {
           this.court=res.data
+          if(!this.$store.state.courtDetail.Players){
+            this.$store.commit("setCourtDetail", res.data);
+            console.log(this.$store.state.courtDetail)
+          }
           // console.log(this.court,"thiscourttt")
         });
     },

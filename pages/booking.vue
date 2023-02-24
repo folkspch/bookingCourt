@@ -220,8 +220,7 @@ export default {
     setSelectedCourt() {
       let data = this.court.find((e) => e.Court_id === this.selectedCourt);
       data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
-      // time:this.selectedTime[0]+"-"+this.selectedTime[1]
-      // console.log(data,"dataaaa")
+      this.$store.commit("setSelectedTime",this.selectedTime);
       this.$store.commit("setSelectedCourt", this.selectedCourt);
       this.$store.commit("setCourtDetail", data);
       console.log(this.$store.state.courtDetail);
@@ -326,16 +325,25 @@ export default {
             userName: "s6104062630508",
           })
           .then((res) => {
+            console.log(res)
+            // let data = this.court.find(
+            //   (e) => e.Court_id === res.data[0].Court
+            // );
+            // console.log(data)
+            // data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
+            // this.$store.commit("setSelectedCourt", this.selectedCourt);
+            // this.$store.commit("setCourtDetail", data);
+            // console.log(this.$store.state.courtDetail);
             if (res.data.length != 0) {
               this.$router.push({
                 name: "confirm_booking",
                 params: {
-                  code : res.data[0].Code,
-                  court : res.data[0].Court
+                  code: res.data[0].Code,
+                  court: res.data[0].Court,
                 },
               });
             } else {
-                this.dialog = true;
+              this.dialog = true;
               return;
             }
           });
