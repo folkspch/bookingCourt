@@ -48,7 +48,7 @@
                   <!-- <v-checkbox v-model="remember" label="จดจำฉันไว้?"></v-checkbox> -->
                   <div class="d-flex justify-center align-center">
                     <v-btn
-                      @click="authen()"
+                      @click="login()"
                       :disabled="this.loading"
                       :loading="this.loading"
                       color="primary"
@@ -102,6 +102,40 @@ export default {
     };
   },
   methods: {
+    async login() {
+      this.loading = true;
+      if (this.user && this.password) {
+        try {
+          await this.$auth.loginWith("local", {
+            data: {
+              username: this.user,
+              password: this.password,
+            },
+          });
+          // this.$router.push('/')
+        } catch (error) {
+          this.loading = false;
+          if (error.response.status == 401) {
+            this.errorMsg =
+              "ชื่อผู้ใช้หรือรหัสผ่านผิด โปรดตรวจสอบและลองอีกครั้ง";
+            this.dialogError = true;
+            setTimeout(() => {
+              this.dialogError = false;
+            }, 2100);
+          } else if (error.response.status == 402) {
+            this.errorMsg = "มีข้อผิดพลาดเกิดขึ้น โปรดลองอีกครั้งภายหลัง";
+            this.dialogError = true;
+          }
+        }
+      }else {
+        this.errorMsg = "โปรดกรอกข้อมูลให้ครบทุกช่อง";
+        this.dialogError = true;
+        this.loading = false;
+        setTimeout(() => {
+          this.dialogError = false;
+        }, 1600);
+      }
+    },
     async authen() {
       if (this.user && this.password) {
         this.loading = true;
@@ -114,21 +148,21 @@ export default {
               },
             })
             .then((response) => {
-              console.log(response.data.userInfo);
-              // console.log(response)
-              // if (response.data.message == "Invalid credentials") {
+              // console.log(response.data.userInfo);
+              // // console.log(response)
+              // // if (response.data.message == "Invalid credentials") {
 
-              //   console.log("wrong pass");
-              // }
-              // else if (response.data.api_status == "success") {
-              //   this.$router.replace({ name: "index" });
-              this.$auth.setUser(response.data.userInfo);
-              let user = {
-                username: response.data.userInfo.username,
-                displayname: response.data.userInfo.displayname,
-              };
-              this.$auth.$storage.setUniversal("user", user, true);
-              // }
+              // //   console.log("wrong pass");
+              // // }
+              // // else if (response.data.api_status == "success") {
+              // //   this.$router.replace({ name: "index" });
+              // this.$auth.setUser(response.data.userInfo);
+              // let user = {
+              //   username: response.data.userInfo.username,
+              //   displayname: response.data.userInfo.displayname,
+              // };
+              // this.$auth.$storage.setUniversal("user", user, true);
+              // // }
               this.loading = false;
             })
             .catch((err) => {
@@ -151,14 +185,7 @@ export default {
           this.loading = false;
           console.log(err);
         }
-      } else {
-        this.errorMsg = "โปรดกรอกข้อมูลให้ครบทุกช่อง";
-        this.dialogError = true;
-        this.loading = false;
-        setTimeout(() => {
-          this.dialogError = false;
-        }, 1600);
-      }
+      } 
     },
   },
 };

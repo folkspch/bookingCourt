@@ -46,29 +46,23 @@ export default {
     middleware: ['auth']
   },
   auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: 'http://localhost:4000/newlogin', method: 'post', propertyName: 'token' },
+          user: { url: 'http://localhost:4000/getUser', method: 'get', propertyName: 'user' },
+          logout: false
+        },
+        tokenRequired: true,
+        tokenType: 'Bearer'
+      }
+    },
     redirect: {
       login: '/login',
       logout: '/login',
-      callback: '/login',
-      home:'/'
+      callback: false,
+      home: '/'
     },
-    strategies: {
-      local: {
-        token: {
-          required: false,
-          type: false,
-          maxAge:2592000
-        }, 
-        endpoints: {
-          login: {
-            url: 'http://localhost:4000/login',
-            method: 'post',
-          },
-          logout:false,
-          user:false
-        },
-      }
-    }
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

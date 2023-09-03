@@ -26,8 +26,8 @@
           <v-icon color="orange lighten-4">mdi-account</v-icon>
         </v-list-item-action>
         <v-list-item-content>
-          <v-list-item-title v-text="this.userInfo.username" />
-          <v-list-item-title v-text="this.userInfo.displayname" />
+          <v-list-item-title>{{ $auth.user.user_id }}</v-list-item-title>
+          <v-list-item-title>{{ $auth.user.name }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
         <v-list-item
@@ -41,7 +41,7 @@
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -128,15 +128,12 @@ export default {
   methods: {
     logout() {
       this.$auth.logout();
-      // this.$router.replace('/login');
+      this.$router.replace('/login');
     },
   },
   created() {
     // console.log(this.$router.name,"router")
   },
-  mounted(){
-    this.userInfo = this.$auth.$storage.getUniversal('user')
-  }
 };
 </script>
 <style scoped>
