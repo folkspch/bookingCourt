@@ -4,7 +4,7 @@
       v-if="selectedCourt != null & this.court.length!=0"
       :class="classPage"
       style="padding: 20px;"
-      max-width="50%"
+      max-width="60%"
       elevation="3"
       light
     >

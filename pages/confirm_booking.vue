@@ -107,13 +107,11 @@
         <v-card>
           <!-- <v-list-item> -->
           <v-system-bar window>
-            <v-card-title style="font-size: 100%;"
-              >รายชื่อผู้เข้าร่วมการจอง 
-              ({{ this.inviteList.length }}/{{
+            <v-card-title style="font-size: 100%"
+              >รายชื่อผู้เข้าร่วมการจอง ({{ this.inviteList.length }}/{{
                 this.$store.state.courtDetail.Players
               }})
-              </v-card-title
-            >
+            </v-card-title>
             <v-spacer></v-spacer>
             <div>
               รหัสเข้าร่วม: {{ this.code }}
@@ -166,10 +164,10 @@
                     </v-btn>
                   </td>
                 </tr>
-                <tr style="background-color:#E0E0E0">
+                <tr style="background-color: #e0e0e0">
                   <td></td>
                   <td></td>
-                  <td>ยืนยันแล้ว {{this.memberCount}} คน</td>
+                  <td>ยืนยันแล้ว {{ this.memberCount }} คน</td>
                   <td></td>
                 </tr>
               </tbody>
@@ -238,12 +236,13 @@
 import axios from "axios";
 import CourtDetail from "@/components/CourtDetail.vue";
 export default {
+  middleware: 'checkBookingValue',
   async asyncData({ params }) {
     const code = params.code;
     const court = params.court;
 
-    console.log(court,code);
-    return { code,court };
+    console.log(court, code);
+    return { code, court };
   },
   components: {
     CourtDetail,
@@ -296,7 +295,6 @@ export default {
       // มีชื่อในสนามอื่นไหม,คนครบไหม,สนามว่างไหม
       // console.log(this.$store.state.courtDetail);
       if (check) {
-        
       }
     },
     checkDelBtn(x) {
@@ -442,16 +440,16 @@ export default {
           this.getLobbyList();
         });
       } else {
+        // this.$router.replace("/booking");
         console.error("error occurred");
       }
     },
     getLobbyList() {
-      let court
-      if(this.$store.state.selectedCourt){
-        court = this.$store.state.selectedCourt
-      }
-      else{
-        court = this.court
+      let court;
+      if (this.$store.state.selectedCourt) {
+        court = this.$store.state.selectedCourt;
+      } else {
+        court = this.court;
       }
       let body = {
         court: court,
@@ -469,11 +467,14 @@ export default {
               status: res.data[i].Invite_status,
             });
           }
-          console.log(this.inviteList, "invitelist");
-          this.memberCount=0
-          for(let i=0;i<this.inviteList.length;i++){
-            if(this.inviteList[i].status=='Confirmed'||this.inviteList[i].status=='Host'){
-              this.memberCount++
+          // console.log(this.inviteList, "invitelist");
+          this.memberCount = 0;
+          for (let i = 0; i < this.inviteList.length; i++) {
+            if (
+              this.inviteList[i].status == "Confirmed" ||
+              this.inviteList[i].status == "Host"
+            ) {
+              this.memberCount++;
             }
           }
         });
@@ -506,7 +507,7 @@ export default {
       }
       this.confirmExit = true;
       if (btn) {
-        this.$router.replace("/booking");
+        // this.$router.replace("/booking");
       }
     },
 
@@ -524,40 +525,26 @@ export default {
     // },
   },
   beforeRouteLeave(to, from, next) {
-    if (this.$auth.loggedIn == true) {
-      if (this.confirmExit) {
-        next();
-      } else {
-        if (
-          window.confirm(
-            "การจองนี้จะถูกยกเลิกหากคุณออกจากหน้านี้ คุณยืนยันจะออกหรือไม่?"
-          )
-        ) {
-          this.cancelBook();
-          next();
-        }
-      }
-    }
+    this.$store.commit("clearState");
+    next();
   },
   created() {
     // window.addEventListener("beforeunload", this.beforeWindowUnload);
   },
   mounted() {
     this.user = this.$auth.$storage.getUniversal("user");
-    if(!this.code){
+    if (!this.code) {
       this.createLobby();
-    }
-    else{
-      this.getLobbyList()
+    } else {
+      this.getLobbyList();
     }
     this.pollData();
   },
   beforeDestroy() {
-    console.log("TEST");
+    this.$store.commit("clearState");
     clearInterval(this.interval);
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

@@ -11,7 +11,7 @@
                   <v-icon v-text="item.icon"></v-icon>
                 </v-list-item-icon> -->
                 <v-list-item-content>
-                  <v-list-item-title v-text="item.Name_th"></v-list-item-title>
+                  <v-list-item-title >{{ item.Name_th }}</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
@@ -39,12 +39,20 @@
                 </p>
                 <p>
                   เวลาเปิด :
-                  {{ this.data[selectedID].TimeOpen.substring(5, 0)}} - {{ this.data[selectedID].TimeClose.substring(5, 0)}}
+                  {{ this.data[selectedID].TimeOpen.substring(5, 0) }} -
+                  {{ this.data[selectedID].TimeClose.substring(5, 0) }}
                 </p>
               </v-card-text>
             </div>
             <v-img max-width="600px" :src="this.data[selectedID].Img">
-            <!-- <v-img src="https://bpicc.cc/i/v5d2lU"></v-img> -->
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="grey-lighten-5"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
             </v-img>
             <!-- {{selectedID}} -->
           </v-card>
@@ -90,7 +98,7 @@ export default {
   },
   mounted() {
     this.API();
-    this.$store.state.courtDetail.time = null
+    this.$store.state.courtDetail.time = null;
   },
 };
 </script>
@@ -99,4 +107,4 @@ export default {
 .stadiumInfo {
   padding: 20px;
 }
-</style>>
+</style>

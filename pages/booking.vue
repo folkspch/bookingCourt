@@ -169,12 +169,10 @@
 </template>
 
 <script>
-import CourtDetail from "@/components/CourtDetail.vue";
+
 import axios from "axios";
 export default {
-  components: {
-    CourtDetail,
-  },
+
   asyncData() {
     return axios.get("http://localhost:4000/getCourtData").then((res) => {
       let courtt = [];
