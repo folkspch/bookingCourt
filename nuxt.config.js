@@ -25,6 +25,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '~/plugins/axios.js',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -52,6 +53,9 @@ export default {
           login: { url: 'http://localhost:4000/newlogin', method: 'post', propertyName: 'token' },
           user: { url: 'http://localhost:4000/getUser', method: 'get', propertyName: 'user' },
           logout: false
+        },
+        token:{
+          maxAge:86400
         },
         tokenRequired: true,
         tokenType: 'Bearer'

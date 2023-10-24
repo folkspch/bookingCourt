@@ -1,11 +1,11 @@
-export default function ({ store,route, redirect }) {
+export default function ({ store,params, redirect }) {
     const someValue = store.state.courtDetail;
-    const x = route.params.code
-    const xx = route.params.court
+    const x = params.code
+    // const xx = route.params.court
     // Replace with your actual getter
-    console.log(someValue);
-    console.log(x);
-    console.log(xx);
+    console.log("x",x);
+    console.log("x",someValue);
+    // console.log(xx);
     // if (!someValue) {
     //   redirect('/another-page'); // Replace with the desired redirection path
     // }

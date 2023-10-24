@@ -12,7 +12,6 @@
           label="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง"
           color="black"
         >
-          <!-- <v-btn large slot="append-outer">TEST</v-btn> -->
         </v-text-field>
       </v-col>
       <v-col cols="1">
@@ -105,7 +104,6 @@
     <v-row>
       <v-col cols="6">
         <v-card>
-          <!-- <v-list-item> -->
           <v-system-bar window>
             <v-card-title style="font-size: 100%"
               >รายชื่อผู้เข้าร่วมการจอง ({{ this.inviteList.length }}/{{
@@ -125,7 +123,6 @@
               รีเฟรชรายชื่อ
             </v-btn>
           </v-system-bar>
-          <!-- </v-list-item> -->
           <v-card
             v-if="this.inviteList.length != 0"
             max-height="500px"
@@ -200,7 +197,11 @@
         <CourtDetail
           class="d-flex justify-center"
           :Court="this.court"
-          :selectedCourt="this.$store.state.selectedCourt"
+          :selectedCourt="
+            this.$store.state.selectedCourt
+              ? this.$store.state.selectedCourt
+              : this.court
+          "
           :page="'confirm_booking'"
         ></CourtDetail>
       </v-col>
@@ -233,10 +234,9 @@
 </template>
 
 <script>
-import axios from "axios";
 import CourtDetail from "@/components/CourtDetail.vue";
 export default {
-  middleware: 'checkBookingValue',
+  middleware: "checkBookingValue",
   async asyncData({ params }) {
     const code = params.code;
     const court = params.court;
@@ -299,13 +299,33 @@ export default {
     },
     checkDelBtn(x) {
       let g = this.inviteList.find((e) => e.id === x);
-      if (x == this.user.username) {
-        return false;
-      } else if (g.status == "Confirmed") {
-        return false;
-      } else {
-        return true;
+      const myId = this.inviteList.find((e) => e.id === this.user.username);
+      if(myId.status == "Host"){
+        if(myId.id == g.id){
+          return false
+        }else if(g.status == "Confirmed"){
+          return false
+        }else{
+          return true
+        }
+      }else{
+        if(myId.id == g.id){
+          return true
+        }else{
+          return false
+        }
       }
+      // const myId = this.inviteList.find((e) => e.id === this.user.username);
+      // if (
+      //   x == this.user.username ||
+      //   myId.status != "Host" ||
+      //   g.status == "Confirmed" ||
+      //   g.status !== "Host"
+      // ) {
+      //   return false;
+      // } else {
+      //   return true;
+      // }
     },
     copyToClipboard() {
       navigator.clipboard.writeText(this.code);
@@ -323,12 +343,14 @@ export default {
       //   court: this.$store.state.selectedCourt,
       // };
       // console.log(body);
-      axios
+      this.$axios
         .delete("http://localhost:4000/delFromList", {
           data: {
             userId: x,
             code: this.code,
-            court: this.$store.state.selectedCourt,
+            court: this.$store.state.selectedCourt
+              ? this.$store.state.selectedCourt
+              : this.court,
           },
         })
         .then((res) => {
@@ -343,12 +365,13 @@ export default {
       // console.log(this.inviteList);
     },
     addToInviteList() {
-      axios
+      this.$axios
         .post("http://localhost:4000/addToList", {
           userId: this.invitee.username,
-          userName: this.invitee.displayname,
           code: this.code,
-          court: this.$store.state.selectedCourt,
+          court: this.$store.state.selectedCourt
+            ? this.$store.state.selectedCourt
+            : this.court,
           courtName: this.$store.state.courtDetail.Name_th,
           time: this.$store.state.courtDetail.time,
         })
@@ -379,15 +402,8 @@ export default {
         var body = {
           username: this.inputID,
         };
-        const config = {
-          headers: { Authorization: `Bearer ${token}` },
-        };
-        axios
-          .post(
-            "https://cors-anywhere.herokuapp.com/https://account.kmutnb.ac.th/api/account-api/user-info",
-            body,
-            config
-          )
+        this.$axios
+          .post("http://localhost:4000/getICITinfo", body)
           .then((res) => {
             console.log(res.data.userInfo);
             if (res.data.userInfo != null) {
@@ -420,64 +436,59 @@ export default {
     },
     createLobby() {
       let body = {
-        userId: this.user.username,
-        userName: this.user.displayname,
         court: this.$store.state.selectedCourt,
         time_start: this.$store.state.selectedTime.time_start,
         time_end: this.$store.state.selectedTime.time_end,
       };
-      console.log(body);
 
       if (
-        (body.userId != undefined) &
         (body.court != "") &
-        (body.userName != undefined) &
         (body.time_start != null) &
         (body.time_end != null)
       ) {
-        axios.post("http://localhost:4000/createList", body).then((res) => {
-          this.code = res.data.code;
-          this.getLobbyList();
-        });
+        this.$axios
+          .post("http://localhost:4000/createList", body)
+          .then((res) => {
+            this.code = res.data.code;
+            this.getLobbyList();
+          });
       } else {
         // this.$router.replace("/booking");
         console.error("error occurred");
       }
     },
     getLobbyList() {
-      let court;
-      if (this.$store.state.selectedCourt) {
-        court = this.$store.state.selectedCourt;
-      } else {
-        court = this.court;
-      }
+      let court = this.$store.state.selectedCourt
+        ? this.$store.state.selectedCourt
+        : this.court;
       let body = {
         court: court,
         code: this.code,
-        status: 0,
       };
       if (body.code != "" && body.court != "") {
-        axios.post("http://localhost:4000/getLobbyData", body).then((res) => {
-          // console.log(res,"resss");
-          this.inviteList = [];
-          for (let i = 0; i < res.data.length; i++) {
-            this.inviteList.push({
-              id: res.data[i].User_id,
-              name: res.data[i].User_name,
-              status: res.data[i].Invite_status,
-            });
-          }
-          // console.log(this.inviteList, "invitelist");
-          this.memberCount = 0;
-          for (let i = 0; i < this.inviteList.length; i++) {
-            if (
-              this.inviteList[i].status == "Confirmed" ||
-              this.inviteList[i].status == "Host"
-            ) {
-              this.memberCount++;
+        this.$axios
+          .post("http://localhost:4000/getLobbyData", body)
+          .then((res) => {
+            // console.log(res,"resss");
+            this.inviteList = [];
+            for (let i = 0; i < res.data.length; i++) {
+              this.inviteList.push({
+                id: res.data[i].User_id,
+                name: res.data[i].User_name,
+                status: res.data[i].Invite_status,
+              });
             }
-          }
-        });
+            console.log(this.inviteList, "invitelist");
+            this.memberCount = 0;
+            for (let i = 0; i < this.inviteList.length; i++) {
+              if (
+                this.inviteList[i].status == "Confirmed" ||
+                this.inviteList[i].status == "Host"
+              ) {
+                this.memberCount++;
+              }
+            }
+          });
       } else {
         console.error("error occurred lb");
       }
@@ -494,7 +505,7 @@ export default {
     },
     cancelBook(btn) {
       if (this.$store.state.selectedCourt && this.code) {
-        axios
+        this.$axios
           .delete("http://localhost:4000/cancelBook", {
             data: {
               court: this.$store.state.selectedCourt,
@@ -532,13 +543,13 @@ export default {
     // window.addEventListener("beforeunload", this.beforeWindowUnload);
   },
   mounted() {
-    this.user = this.$auth.$storage.getUniversal("user");
+    this.user.username = this.$auth.user.user_id;
     if (!this.code) {
       this.createLobby();
     } else {
       this.getLobbyList();
     }
-    this.pollData();
+    // this.pollData();
   },
   beforeDestroy() {
     this.$store.commit("clearState");

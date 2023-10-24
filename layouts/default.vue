@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-navigation-drawer
+      :src="require('../assets/Image/sidebar_bg.jpg')"
       v-model="drawer"
       :mini-variant="miniVariant"
       :clipped="clipped"
@@ -49,7 +50,7 @@
     <v-app-bar :clipped-left="clipped" fixed app :color="themeColor">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-spacer />
-      <a style="color: white; margin-right: 0">การจองของฉัน</a>
+      <a style="color: white; margin-right: 0" @click="$router.push('/my_book')">การจองของฉัน</a>
       <v-divider light vertical inset class="mx-2"></v-divider>
       <a @click="logout()" style="color: white; margin-right: 0">ออกจากระบบ</a>
     </v-app-bar>
@@ -83,7 +84,7 @@ export default {
         username:"",
         displayname:""
       },
-      themeColor: "#ff964f",
+      themeColor: "#FF8B10",
       clipped: false,
       drawer: true,
       fixed: false,

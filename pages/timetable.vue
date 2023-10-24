@@ -2,56 +2,16 @@
   <div>
     <v-col class="d-flex" cols="12" sm="6">
       <v-select
+        placeholder="กรุณาเลือกสนาม"
+        item-color="orange"
         v-model="selectedCourt"
         :items="court"
         item-text="Name_th"
         item-value="Court_id"
-        @change="plotTable()"
         solo
       ></v-select>
     </v-col>
-    <v-simple-table class="mb-5">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th style="background-color: #bebebe">ช่วงเวลา</th>
-            <th
-              style="background-color: #ebecf0"
-              v-for="(item, index) in time"
-              :key="index"
-              class="pa-3"
-            >
-              {{ item }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="pa-5" style="background-color: #ebecf0">
-              <v-row
-                ><v-avatar class="mt-1" color="red" size="10"></v-avatar>
-                <p class="ml-2">ไม่ว่าง</p></v-row
-              >
-              <v-row
-                ><v-avatar class="mt-1" color="blue" size="10"></v-avatar>
-                <p class="ml-2">กำลังดำเนินการ</p></v-row
-              >
-              <v-row
-                ><v-avatar class="mt-1" color="green" size="10"></v-avatar>
-                <p class="ml-2">ว่าง</p></v-row
-              >
-            </td>
-            <!-- <div v-if="selectedCourt"> -->
-            <td
-              v-for="index in time.length"
-              :key="index"
-              :id="'table' + index"
-            ></td>
-            <!-- </div> -->
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
+    <Timetable :selectedCourt="selectedCourt" :court="court"/>
 
     <v-divider></v-divider>
 
@@ -75,13 +35,14 @@
 
 <script>
 import CourtDetail from "@/components/CourtDetail.vue";
-import axios from "axios";
+import Timetable from "~/components/Timetable.vue";
 export default {
   components: {
     CourtDetail,
+    Timetable
   },
-  asyncData() {
-    return axios.get("http://localhost:4000/getCourtData").then((res) => {
+  async asyncData({$axios}) {
+    return await $axios.get("http://localhost:4000/getCourtData").then((res) => {
       let courtt = [];
       courtt = res.data;
       let listCourtt = [];

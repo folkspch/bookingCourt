@@ -3,6 +3,7 @@
     <v-row class="d-flex">
       <v-col cols="5">
         <v-select
+          item-color="orange"
           label="กรุณาเลือกสนามที่ต้องการจอง"
           v-model="selectedCourt"
           :items="court"
@@ -84,6 +85,7 @@
       <v-col cols="3">
         <v-row>
           <v-select
+            item-color="orange"
             v-model="selectedTime"
             :items="timeChoice"
             item-text="TimeForShow"
@@ -170,11 +172,10 @@
 
 <script>
 
-import axios from "axios";
 export default {
 
-  asyncData() {
-    return axios.get("http://localhost:4000/getCourtData").then((res) => {
+ async asyncData({$axios}) {
+    return await $axios.get("http://localhost:4000/getCourtData").then((res) => {
       let courtt = [];
       courtt = res.data;
       let listCourtt = [];
@@ -317,27 +318,18 @@ export default {
     },
     joinByCode() {
       if (this.invite_code && this.invite_code.length >= 6) {
-        axios
+        this.$axios
           .post("http://localhost:4000/joinFromCode", {
             code: this.invite_code,
-            userName: "s6104062630508",
           })
           .then((res) => {
-            console.log(res)
-            // let data = this.court.find(
-            //   (e) => e.Court_id === res.data[0].Court
-            // );
-            // console.log(data)
-            // data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
-            // this.$store.commit("setSelectedCourt", this.selectedCourt);
-            // this.$store.commit("setCourtDetail", data);
-            // console.log(this.$store.state.courtDetail);
+            console.log("res",res)
             if (res.data.length != 0) {
               this.$router.push({
                 name: "confirm_booking",
                 params: {
-                  code: res.data[0].Code,
-                  court: res.data[0].Court,
+                  code: res.data.code,
+                  court: res.data.court,
                 },
               });
             } else {

@@ -14,7 +14,7 @@
         <v-img
           contain
           max-height="900px"
-          src="https://sv1.picz.in.th/images/2022/08/24/aSEICl.jpg"
+          :src="require('../assets/Image/login_bg.jpg')"
         >
           <v-col
             cols="12"
@@ -87,7 +87,6 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
   layout: "loginLayout",
   data() {

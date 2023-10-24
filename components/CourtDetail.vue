@@ -43,7 +43,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 export default {
   data() {
     return {
@@ -60,7 +59,7 @@ export default {
   },
   methods: {
     getCourtList(){
-       axios
+       this.$axios
         .get("http://localhost:4000/getCourtData")
         .then((res) => {
           this.court=res.data

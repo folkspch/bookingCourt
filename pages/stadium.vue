@@ -6,12 +6,12 @@
           <v-list light>
             <v-subheader style="font-size: 20px">รายชื่อสนาม</v-subheader>
             <v-list-item-group v-model="selectedID" color="primary">
-              <v-list-item v-for="(item, index) in this.data" :key="index">
+              <v-list-item v-for="(item, index) in this.data" :key="index" color="orange">
                 <!-- <v-list-item-icon>
                   <v-icon v-text="item.icon"></v-icon>
                 </v-list-item-icon> -->
                 <v-list-item-content>
-                  <v-list-item-title >{{ item.Name_th }}</v-list-item-title>
+                  <v-list-item-title>{{ item.Name_th }}</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
