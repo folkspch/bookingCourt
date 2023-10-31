@@ -25,6 +25,37 @@
         >
       </v-col>
     </v-row>
+    <v-dialog v-model="confirmationDialog" persistent>
+      <v-card>
+        <v-card-title>ยืนยันการเชิญ</v-card-title>
+        <v-card-text>
+          คุณต้องการเชิญ
+          <strong
+            >{{ this.invitee.username }} {{ this.invitee.displayname }}</strong
+          >
+          หรือไม่?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="error" @click="dialog = false">ยกเลิก</v-btn>
+          <v-btn color="success" @click="addToInviteList()">ยืนยัน</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="canceledDialog" persistent>
+      <v-card>
+        <v-card-title>ยกเลิกการจอง</v-card-title>
+        <v-card-text>
+          คุณได้ยกเลิกการจองนี้แล้ว
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="$router.replace('booking')">ตกลง</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="dialog" persistent>
       <v-card>
         <v-card-title>ยืนยันการเชิญ</v-card-title>
@@ -107,7 +138,7 @@
           <v-system-bar window>
             <v-card-title style="font-size: 100%"
               >รายชื่อผู้เข้าร่วมการจอง ({{ this.inviteList.length }}/{{
-                this.$store.state.courtDetail.Players
+                playerCondition.player
               }})
             </v-card-title>
             <v-spacer></v-spacer>
@@ -269,12 +300,16 @@ export default {
       interval: null,
       user: {},
       confirmExit: false,
+      playerCondition: {},
+      confirmationDialog: false,
+      confirmationDialogText: {
+        header: "",
+        msg: "",
+      },
+      canceledDialog:false
     };
   },
   methods: {
-    test() {
-      console.log(this.$store.state.userId);
-    },
     sendRequest() {
       console.log(this.user);
       let check =
@@ -300,19 +335,19 @@ export default {
     checkDelBtn(x) {
       let g = this.inviteList.find((e) => e.id === x);
       const myId = this.inviteList.find((e) => e.id === this.user.username);
-      if(myId.status == "Host"){
-        if(myId.id == g.id){
-          return false
-        }else if(g.status == "Confirmed"){
-          return false
-        }else{
-          return true
+      if (myId.status == "Host") {
+        if (myId.id == g.id) {
+          return false;
+        } else if (g.status == "Confirmed") {
+          return false;
+        } else {
+          return true;
         }
-      }else{
-        if(myId.id == g.id){
-          return true
-        }else{
-          return false
+      } else {
+        if (myId.id == g.id) {
+          return true;
+        } else {
+          return false;
         }
       }
       // const myId = this.inviteList.find((e) => e.id === this.user.username);
@@ -472,13 +507,14 @@ export default {
             // console.log(res,"resss");
             this.inviteList = [];
             for (let i = 0; i < res.data.length; i++) {
+              this.playerCondition.player = res.data[0].Players;
+              this.playerCondition.player_strict = res.data[0].Players_strict;
               this.inviteList.push({
                 id: res.data[i].User_id,
                 name: res.data[i].User_name,
                 status: res.data[i].Invite_status,
               });
             }
-            console.log(this.inviteList, "invitelist");
             this.memberCount = 0;
             for (let i = 0; i < this.inviteList.length; i++) {
               if (
@@ -504,22 +540,24 @@ export default {
       }
     },
     cancelBook(btn) {
-      if (this.$store.state.selectedCourt && this.code) {
+      this.dialogCancel = false
+      if ((this.$store.state.selectedCourt||this.court) && this.code) {
         this.$axios
           .delete("http://localhost:4000/cancelBook", {
             data: {
-              court: this.$store.state.selectedCourt,
+              court: this.$store.state.selectedCourt
+                ? this.$store.state.selectedCourt
+                : this.court,
               code: this.code,
             },
           })
-          .then(() => {
-            console.log("canceled");
+          .then((res) => {
+            if (res.status === 200){
+              this.canceledDialog = true
+            }
           });
       }
       this.confirmExit = true;
-      if (btn) {
-        // this.$router.replace("/booking");
-      }
     },
 
     // beforeWindowUnload(e) {
@@ -534,6 +572,7 @@ export default {
     //     e.returnValue = "";
     //   }
     // },
+    
   },
   beforeRouteLeave(to, from, next) {
     this.$store.commit("clearState");

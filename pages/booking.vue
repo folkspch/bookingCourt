@@ -266,7 +266,7 @@ export default {
           );
           let temp = document.getElementById("table" + (i + 1));
           if (found) {
-            console.log("Status", found.Status, "Time", found.Time_Start);
+            // console.log("Status", found.Status, "Time", found.Time_Start);
             if (found.Status == "0") {
               temp.classList.add("reserved");
             } else if (found.Status == "1") {
