@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row no-gutters class="d-flex">
-      <v-col cols="6">
+      <v-col :cols="$vuetify.breakpoint.xsOnly ? 9 : 6">
         <v-text-field
           height="51px"
           hint="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง เช่น s6101234567890"
@@ -133,10 +133,10 @@
       </v-card>
     </v-dialog>
     <v-row>
-      <v-col cols="6">
+      <v-col :cols="$vuetify.breakpoint.xsOnly ? 12 : 6">
         <v-card>
-          <v-system-bar window>
-            <v-card-title style="font-size: 100%"
+          <v-system-bar window style="height: 100%;">
+            <v-card-title style="font-size: 1rem"
               >รายชื่อผู้เข้าร่วมการจอง ({{ this.inviteList.length }}/{{
                 playerCondition.player
               }})
@@ -224,7 +224,7 @@
           </v-card>
         </v-card>
       </v-col>
-      <v-col cols="6">
+      <v-col :cols="$vuetify.breakpoint.xsOnly ? 12 : 6">
         <CourtDetail
           class="d-flex justify-center"
           :Court="this.court"
@@ -245,8 +245,8 @@
         >ส่งคำขอการจองสนาม</v-btn
       >
     </v-row> -->
-    <v-footer absolute class="mb-5" color="white">
-      <v-row class="d-flex justify-end">
+    <v-footer absolute :class="$vuetify.breakpoint.xsOnly ? 'sticky-footer py-5' : 'mb-5'" :color="$vuetify.breakpoint.xsOnly ? '#e0e0e0' : 'white'">
+      <v-row class="d-flex justify-center justify-lg-end">
         <v-btn
           @click="dialogCancel = true"
           class="mx-2"
@@ -597,4 +597,11 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.sticky-footer {
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+}
+
+</style>

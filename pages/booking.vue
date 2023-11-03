@@ -1,8 +1,9 @@
 <template>
   <div>
-    <v-row class="d-flex">
-      <v-col cols="5">
+    <v-row align="center" class="d-flex mb-3 mt-2">
+      <v-col cols="12" lg="5">
         <v-select
+          hide-details
           item-color="orange"
           label="กรุณาเลือกสนามที่ต้องการจอง"
           v-model="selectedCourt"
@@ -13,11 +14,12 @@
           solo
         ></v-select>
       </v-col>
-      <div class="mt-7 px-5">หรือ</div>
-      <v-col cols="6">
+      <div class="px-5">หรือ</div>
+      <v-col cols="12" lg="6">
         <v-row no-gutters class="d-flex">
-          <v-col cols="">
+          <v-col cols="9" lg="">
             <v-text-field
+              hide-details
               v-model="invite_code"
               solo
               placeholder="กรอกรหัสเข้าร่วมการจอง"
@@ -82,7 +84,7 @@
     </v-simple-table>
     <div v-if="selectedCourt != null">
       <v-divider class="pb-5"></v-divider>
-      <v-col cols="3">
+      <v-col cols="12" lg="3">
         <v-row>
           <v-select
             item-color="orange"
@@ -101,7 +103,7 @@
     <v-divider class="pb-5"></v-divider>
     <div v-if="selectedTime != null">
       <v-row>
-        <v-col cols="6">
+        <v-col cols="12" lg="6">
           <v-card>
             <v-card-title>รายละเอียดการจอง</v-card-title>
             <v-row class="mx-0">
@@ -140,14 +142,17 @@
             </v-row>
           </v-card>
         </v-col>
-        <v-col cols="6">
-          <div v-if="this.selectedCourt && this.selectedTime">
+        <v-col cols="12" lg="6">
+          <div
+            v-if="this.selectedCourt && this.selectedTime"
+            class="d-flex justify-end"
+          >
             <v-btn
+              :absolute="!$vuetify.breakpoint.xsOnly"
               @click="setSelectedCourt()"
               large
               bottom
               right
-              absolute
               color="primary"
               width="10%"
               >ต่อไป</v-btn
@@ -171,22 +176,22 @@
 </template>
 
 <script>
-
 export default {
-
- async asyncData({$axios}) {
-    return await $axios.get("http://localhost:4000/getCourtData").then((res) => {
-      let courtt = [];
-      courtt = res.data;
-      let listCourtt = [];
-      for (let i = 0; i < courtt.length; i++) {
-        listCourtt[i] = courtt[i].Name_th;
-      }
-      return {
-        court: courtt,
-        listCourt: listCourtt,
-      };
-    });
+  async asyncData({ $axios }) {
+    return await $axios
+      .get("http://localhost:4000/getCourtData")
+      .then((res) => {
+        let courtt = [];
+        courtt = res.data;
+        let listCourtt = [];
+        for (let i = 0; i < courtt.length; i++) {
+          listCourtt[i] = courtt[i].Name_th;
+        }
+        return {
+          court: courtt,
+          listCourt: listCourtt,
+        };
+      });
   },
   data() {
     return {
@@ -219,7 +224,7 @@ export default {
     setSelectedCourt() {
       let data = this.court.find((e) => e.Court_id === this.selectedCourt);
       data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
-      this.$store.commit("setSelectedTime",this.selectedTime);
+      this.$store.commit("setSelectedTime", this.selectedTime);
       this.$store.commit("setSelectedCourt", this.selectedCourt);
       this.$store.commit("setCourtDetail", data);
       console.log(this.$store.state.courtDetail);
@@ -323,7 +328,7 @@ export default {
             code: this.invite_code,
           })
           .then((res) => {
-            console.log("res",res)
+            console.log("res", res);
             if (res.data.length != 0) {
               this.$router.push({
                 name: "confirm_booking",

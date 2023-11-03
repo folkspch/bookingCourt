@@ -4,9 +4,11 @@
       <p>ยังไม่มีรายการจองสนามในวันนี้</p>
     </div>
     <div v-else>
+      <v-col cols="12" lg="6">
       <div v-for="(item, index) in bookingList" :key="index">
         <BookingBox :bookingList="item" />
       </div>
+    </v-col>
     </div>
   </div>
 </template>

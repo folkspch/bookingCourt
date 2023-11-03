@@ -142,4 +142,5 @@ export default {
 * {
   font-family: "Prompt", sans-serif;
 }
+
 </style>

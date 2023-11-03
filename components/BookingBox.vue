@@ -1,7 +1,7 @@
 <template>
   <div class="my-5 ml-3" id="card">
-    <v-card class="mt-3" max-width="45%" hover @click="gotoBookingInfo()">
-      <v-row dense align="center">
+    <v-card class="mt-3" hover @click="gotoBookingInfo()">
+      <v-row dense :no-gutters="$vuetify.breakpoint.xsOnly" align="center">
         <v-col cols="4">
           <div class="px-3 ml-3">
             <v-img width="200" height="170" contain :src="bookingList.Img">
@@ -17,14 +17,21 @@
         </v-col>
         <v-col cols="6">
           <div>
-            <div style="display: flex; align-items: center; width: 100%">
+            <div
+              style="align-items: center; width: 100%"
+              :class="$vuetify.breakpoint.xsOnly ? 'd-block' : 'd-flex'"
+            >
               <v-card-title>{{ bookingList.Name_th }}</v-card-title>
-              <v-chip color="amber" v-if="bookingList.Status == 'pending'"
-                >กำลังดำเนินการ</v-chip
-              >
-              <v-chip color="green" v-else-if="bookingList.Status == 'success'"
-                >สำเร็จแล้ว</v-chip
-              >
+              <div :class="$vuetify.breakpoint.xsOnly ? 'ml-3 mb-2' : ''" >
+                <v-chip color="amber" v-if="bookingList.Status == 'pending'"
+                  >กำลังดำเนินการ</v-chip
+                >
+                <v-chip
+                  color="green"
+                  v-else-if="bookingList.Status == 'success'"
+                  >สำเร็จแล้ว</v-chip
+                >
+              </div>
             </div>
             <v-card-text style="margin-top: -15px">
               <div>
@@ -44,7 +51,12 @@
               height: 100%;
             "
           >
-            <v-btn color="primary" @click="gotoBookingInfo()">ดูข้อมูล</v-btn>
+            <v-btn
+              color="primary"
+              :width="$vuetify.breakpoint.xsOnly ? '100%' : ''"
+              @click="gotoBookingInfo()"
+              >ดูข้อมูล</v-btn
+            >
           </div>
         </v-col>
       </v-row>
