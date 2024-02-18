@@ -9,6 +9,7 @@ export default () =>
       userId: "",
       userName: "",
       selectedCourt: "",
+      selectedTimeRange : "",
       selectedTime: {
         time_start: null,
         time_end: null,
