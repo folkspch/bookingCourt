@@ -119,6 +119,46 @@ export default {
           title: "ติดต่อ",
           to: "/contact",
         },
+        {
+          icon: "mdi-contacts",
+          title: "index",
+          to: "/admin/index",
+        },
+        {
+          icon: "mdi-contacts",
+          title: "rules",
+          to: "/admin/rules",
+        },
+        {
+          icon: "mdi-contacts",
+          title: "stadium",
+          to: "/admin/stadium",
+        },
+        {
+          icon: "mdi-contacts",
+          title: "booking",
+          to: "/admin/booking",
+        },
+        {
+          icon: "mdi-contacts",
+          title: "timetable",
+          to: "/admin/timetable",
+        },
+        {
+          icon: "mdi-contacts",
+          title: "import",
+          to: "/admin/import",
+        },
+        {
+          icon: "mdi-contacts",
+          title: "approve",
+          to: "/admin/approve",
+        },
+        {
+          icon: "mdi-contacts",
+          title: "export",
+          to: "/admin/export",
+        },
       ],
       miniVariant: false,
       right: true,
