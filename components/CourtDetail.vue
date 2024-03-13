@@ -25,9 +25,9 @@
             จำนวนผู้เล่นขั้นต่ำ :
             {{ this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Players }} คน
           </p>
-          <p v-if="$store.state.courtDetail.time">
+          <p v-if="this.selectedTime">
             ช่วงเวลาที่ต้องการจอง :
-            {{ this.$store.state.courtDetail.time }}
+            {{ this.selectedTime }}
           </p>
         </v-card-text>
       </div>
@@ -56,6 +56,7 @@ export default {
     Court: String,
     selectedCourt: String,
     page: String,
+    selectedTime:String
   },
   methods: {
     getCourtList(){

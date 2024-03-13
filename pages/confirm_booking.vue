@@ -228,12 +228,9 @@
         <CourtDetail
           class="d-flex justify-center"
           :Court="this.court"
-          :selectedCourt="
-            this.$store.state.selectedCourt
-              ? this.$store.state.selectedCourt
-              : this.court
-          "
+          :selectedCourt="this.court"
           :page="'confirm_booking'"
+          :selectedTime="this.selectedTime"
         ></CourtDetail>
       </v-col>
     </v-row>
@@ -306,7 +303,8 @@ export default {
         header: "",
         msg: "",
       },
-      canceledDialog:false
+      canceledDialog:false,
+      selectedTime:null
     };
   },
   methods: {
@@ -493,18 +491,16 @@ export default {
       }
     },
     getLobbyList() {
-      let court = this.$store.state.selectedCourt
-        ? this.$store.state.selectedCourt
-        : this.court;
       let body = {
-        court: court,
+        court:  this.court,
         code: this.code,
       };
       if (body.code != "" && body.court != "") {
         this.$axios
           .post("http://localhost:4000/getLobbyData", body)
           .then((res) => {
-            // console.log(res,"resss");
+            console.log(res,"resss");
+            this.selectedTime = `${res.data[0].Time_start} - ${res.data[0].Time_end}`
             this.inviteList = [];
             for (let i = 0; i < res.data.length; i++) {
               this.playerCondition.player = res.data[0].Players;

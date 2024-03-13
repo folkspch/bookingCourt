@@ -149,6 +149,7 @@
           >
             <v-btn
               :absolute="!$vuetify.breakpoint.xsOnly"
+              :loading="this.loading"
               @click="createLobby()"
               large
               bottom
@@ -217,11 +218,13 @@ export default {
       timeChoice: [],
       invite_code: null,
       dialog: false,
+      loading:false
     };
   },
 
   methods: {
     createLobby() {
+      this.loading = true
       let body = {
         court: this.selectedCourt,
         time_start: this.selectedTime[0],
@@ -235,6 +238,7 @@ export default {
         this.$axios
           .post("http://localhost:4000/createList", body)
           .then((res) => {
+            this.loading = false
             this.$router.push({
                 name: "confirm_booking",
                 params: {
@@ -244,7 +248,7 @@ export default {
               });
           });
       } else {
-        // this.$router.replace("/booking");
+        this.loading = false
         console.error("error occurred");
       }
     },
