@@ -14,24 +14,6 @@
           solo
         ></v-select>
       </v-col>
-      <div class="px-5">และ</div>
-      <v-col cols="12" lg="6">
-        <v-row no-gutters class="d-flex">
-          <v-col cols="9" lg="">
-            <v-select
-              hide-details
-              item-color="orange"
-              label="เลือกระยะเวลาที่ต้องการจอง"
-              v-model="selectedTimeRange"
-              :items="timeList"
-              item-text="time"
-              item-value="time"
-              @change="plotTable()"
-              solo
-            ></v-select>
-          </v-col>
-        </v-row>
-      </v-col>
     </v-row>
     <v-simple-table v-if="this.selectedCourt" class="mb-5">
       <template v-slot:default>
@@ -77,26 +59,35 @@
         </tbody>
       </template>
     </v-simple-table>
-    <div v-if="selectedCourt != null && selectedTimeRange != null">
+    <div v-if="selectedCourt != null">
       <v-divider class="pb-5"></v-divider>
-      <v-col cols="12" lg="3">
+      <v-col cols="12">
         <v-row>
           <v-select
             item-color="orange"
             v-model="selectedTime"
             :items="timeChoice"
-            item-text="TimeForShow"
+            item-text="TimeBefore"
             item-value="Time"
             solo
             label="กรุณาเลือกช่วงเวลาที่ต้องการจอง"
           >
           </v-select>
-          <!-- {{ this.selectedTime }} -->
+          <v-select
+            item-color="orange"
+            v-model="selectedTimeB"
+            :items="timeChoice"
+            item-text="TimeAfter"
+            item-value="Time"
+            solo
+            label="กรุณาเลือกช่วงเวลาที่ต้องการจอง"
+          >
+          </v-select>
         </v-row>
       </v-col>
     </div>
     <v-divider class="pb-5"></v-divider>
-    <div v-if="selectedTime != null">
+    <div v-if="selectedTime != null && selectedTimeB != null">
       <v-row>
         <v-col cols="12" lg="6">
           <v-card>
@@ -123,7 +114,7 @@
                   </p>
                   <p>
                     ช่วงเวลาที่ต้องการจอง :
-                    {{ this.selectedTime[0] + " - " + this.selectedTime[1] }}
+                    {{ this.selectedTime[0] + " - " + this.selectedTimeB[1] }}
                   </p>
                 </v-card-text>
               </v-col>
@@ -139,7 +130,7 @@
         </v-col>
         <v-col cols="12" lg="6">
           <div
-            v-if="this.selectedCourt && this.selectedTime"
+            v-if="this.selectedCourt && this.selectedTime && this.selectedTimeB"
             class="d-flex justify-end"
           >
             <v-btn
@@ -213,6 +204,7 @@ export default {
       selectedCourt: null,
       selectedTimeRange: null,
       selectedTime: null,
+      selectedTimeB: null,
       OpsTime: { OpenTime: null, CloseTime: null, ArrTime: [] },
       table: [],
       plotStatus: 0,
@@ -225,13 +217,21 @@ export default {
 
   methods: {
     setSelectedCourt() {
-      let data = this.court.find((e) => e.Court_id === this.selectedCourt);
-      data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
-      this.$store.commit("setSelectedTime", this.selectedTime);
-      this.$store.commit("setSelectedCourt", this.selectedCourt);
-      this.$store.commit("setCourtDetail", data);
-      console.log(this.$store.state.courtDetail);
-      this.$router.replace("/confirm_booking");
+      const timeBefore = parseFloat(this.selectedTime[0]);
+      const timeAfter = parseFloat(this.selectedTimeB[1]);
+      if (timeAfter >= timeBefore) {
+        let data = this.court.find((e) => e.Court_id === this.selectedCourt);
+        data.time = this.selectedTime[0] + "-" + this.selectedTimeB[1];
+        this.$store.commit("setSelectedTime", this.selectedTime);
+        this.$store.commit("setSelectedTimeB", this.selectedTimeB);
+        this.$store.commit("setSelectedCourt", this.selectedCourt);
+        this.$store.commit("setCourtDetail", data);
+        console.log(this.$store.state.courtDetail);
+        this.$router.replace("/confirm_booking");
+      }else{
+                alert("Error: TimeAfter cannot be less than or equal to TimeBefore"   );
+
+      }
     },
     isInRange(value, range) {
       if (this.plotStatus == 1) {
@@ -293,6 +293,7 @@ export default {
       console.log("SET");
       this.OpsTime.ArrTime = [];
       this.selectedTime = null;
+      this.selectedTimeB = null;
       this.OpsTime.OpenTime = parseInt(
         this.court[parseInt(this.selectedCourt) - 1].TimeOpen.substring(0, 2)
       );
@@ -301,45 +302,16 @@ export default {
       );
       console.log("ggin", this.OpsTime.OpenTime, this.OpsTime.CloseTime);
       console.log("ggin", this.selectedTimeRange);
-      if (this.selectedTimeRange == 3) {
-        for (
-          let i = this.OpsTime.OpenTime;
-          i < this.OpsTime.CloseTime;
-          i += 3
-        ) {
-          var temp1 = i + ".00";
-          var temp2 = i + 3 + ".00";
-          this.OpsTime.ArrTime.push({
-            Time: [temp1, temp2],
-            TimeForShow: temp1 + " - " + temp2,
-          });
-        }
-      } else if (this.selectedTimeRange == 2) {
-        for (
-          let i = this.OpsTime.OpenTime;
-          i < this.OpsTime.CloseTime;
-          i += 2
-        ) {
-          var temp1 = i + ".00";
-          var temp2 = i + 2 + ".00";
-          this.OpsTime.ArrTime.push({
-            Time: [temp1, temp2],
-            TimeForShow: temp1 + " a - " + temp2,
-          });
-        }
-      } else {
-        for (
-          let i = this.OpsTime.OpenTime;
-          i < this.OpsTime.CloseTime;
-          i += 1
-        ) {
-          var temp1 = i + ".00";
-          var temp2 = i + 1 + ".00";
-          this.OpsTime.ArrTime.push({
-            Time: [temp1, temp2],
-            TimeForShow: temp1 + " a - " + temp2,
-          });
-        }
+
+      for (let i = this.OpsTime.OpenTime; i < this.OpsTime.CloseTime; i += 1) {
+        var temp1 = i + ".00";
+        var temp2 = i + 1 + ".00";
+        this.OpsTime.ArrTime.push({
+          Time: [temp1, temp2],
+          TimeForShow: temp1 + " a - " + temp2,
+          TimeBefore: temp1,
+          TimeAfter: temp2,
+        });
       }
 
       console.log(this.OpsTime.ArrTime, "ArrTime");
