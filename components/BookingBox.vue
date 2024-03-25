@@ -15,7 +15,7 @@
             ></v-img>
           </div>
         </v-col>
-        <v-col cols="6">
+        <v-col :cols="$vuetify.breakpoint.xsOnly?8:6">
           <div>
             <div
               style="align-items: center; width: 100%"
@@ -23,13 +23,20 @@
             >
               <v-card-title>{{ bookingList.Name_th }}</v-card-title>
               <div :class="$vuetify.breakpoint.xsOnly ? 'ml-3 mb-2' : ''" >
-                <v-chip color="amber" v-if="bookingList.Status == 'pending'"
+                <v-chip dark color="amber" v-if="bookingList.Status == 'pending'"
                   >กำลังดำเนินการ</v-chip
                 >
                 <v-chip
+                dark
                   color="green"
                   v-else-if="bookingList.Status == 'success'"
                   >สำเร็จแล้ว</v-chip
+                >
+                <v-chip
+                dark
+                  color="red"
+                  v-else-if="bookingList.Status == 'reject'"
+                  >ถูกยกเลิก</v-chip
                 >
               </div>
             </div>
@@ -42,7 +49,7 @@
             </v-card-text>
           </div>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="2" v-if="!$vuetify.breakpoint.xsOnly">
           <div
             style="
               display: flex;
