@@ -228,9 +228,8 @@ export default {
         this.$store.commit("setCourtDetail", data);
         console.log(this.$store.state.courtDetail);
         this.$router.replace("/confirm_booking");
-      }else{
-                alert("Error: TimeAfter cannot be less than or equal to TimeBefore"   );
-
+      } else {
+        alert("Error: TimeAfter cannot be less than or equal to TimeBefore");
       }
     },
     isInRange(value, range) {
@@ -244,7 +243,7 @@ export default {
       let d = new Date();
       let today =
         d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-      today = "2022-07-29";
+      today = "2024-03-23";
       const options = {
         url: `http://localhost:4000/getBookingData/${today}/${this.selectedCourt}`,
         method: "GET",
@@ -267,12 +266,18 @@ export default {
           temp1.classList.remove("reserved");
           temp1.classList.remove("inProgress");
           temp1.classList.remove("free");
+          
         }
+       
         for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
           var found = this.table.find(
             (e) => e.Time_Start === this.OpsTime.ArrTime[i].Time[0]
           );
           let temp = document.getElementById("table" + (i + 1));
+          if (this.table[0]?.is_available == 0) {
+            console.log("asdasd");
+            temp.classList.add("inProgress");
+          }
           if (found) {
             // console.log("Status", found.Status, "Time", found.Time_Start);
             if (found.Status == "0") {
@@ -283,8 +288,19 @@ export default {
           } else {
             temp.classList.add("free");
           }
+          
         }
         this.countSlot = OpsHour;
+         for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
+          
+          let temp = document.getElementById("table" + (i + 1));
+          if (this.table[0]?.is_available == 0) {
+            console.log("asdasd");
+            temp.classList.add("inProgress");
+          }
+          
+          
+        }
         this.filterTime();
       });
       this.setOpTime();

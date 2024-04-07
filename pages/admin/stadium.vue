@@ -6,7 +6,11 @@
           <v-list light>
             <v-subheader style="font-size: 20px">รายชื่อสนาม</v-subheader>
             <v-list-item-group v-model="selectedID" color="primary">
-              <v-list-item v-for="(item, index) in this.data" :key="index" color="orange">
+              <v-list-item
+                v-for="(item, index) in this.data"
+                :key="index"
+                color="orange"
+              >
                 <!-- <v-list-item-icon>
                   <v-icon v-text="item.icon"></v-icon>
                 </v-list-item-icon> -->
@@ -27,7 +31,25 @@
             elevation="3"
             light
           >
-            <v-card-title>รายละเอียดสนาม</v-card-title>
+            <div>
+              <v-row>
+                <v-col>
+                  <v-card-title>รายละเอียดสนาม</v-card-title>
+                </v-col>
+                <v-col>
+                  <button
+                    @click="toggleButton"
+                    :class="{
+                      'toggle-button-on': buttonOn,
+                      'toggle-button-off': !buttonOn,
+                    }"
+                  >
+                    {{ buttonText }}
+                  </button>
+                </v-col>
+              </v-row>
+            </div>
+
             <div class="mx-auto">
               <v-card-text>
                 <p>ชื่อสนาม : {{ this.data[selectedID].Name_th }}</p>
@@ -80,6 +102,7 @@ export default {
           Type_th: "",
         },
       ],
+      buttonOn: false,
     };
   },
   methods: {
@@ -95,10 +118,19 @@ export default {
         console.log("API connected");
       });
     },
+    toggleButton() {
+      this.buttonOn = !this.buttonOn;
+      console.log(this.buttonOn);
+    },
   },
   mounted() {
     this.API();
     this.$store.state.courtDetail.time = null;
+  },
+  computed: {
+    buttonText() {
+      return this.buttonOn ? "Turn On" : "Turn Off";
+    },
   },
 };
 </script>
@@ -106,5 +138,40 @@ export default {
 <style scoped>
 .stadiumInfo {
   padding: 20px;
+}
+.toggle-button-on {
+  background-color: #4caf50; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.toggle-button-off {
+  background-color: #f44336; /* Red */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.toggle-button-on:hover {
+  background-color: #45a049; /* Darker green */
+}
+
+.toggle-button-off:hover {
+  background-color: #e53935; /* Darker red */
 }
 </style>
