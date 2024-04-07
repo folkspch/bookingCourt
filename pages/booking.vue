@@ -149,7 +149,8 @@
           >
             <v-btn
               :absolute="!$vuetify.breakpoint.xsOnly"
-              @click="setSelectedCourt()"
+              :loading="this.loading"
+              @click="createLobby()"
               large
               bottom
               right
@@ -217,19 +218,49 @@ export default {
       timeChoice: [],
       invite_code: null,
       dialog: false,
+      loading:false
     };
   },
 
   methods: {
-    setSelectedCourt() {
-      let data = this.court.find((e) => e.Court_id === this.selectedCourt);
-      data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
-      this.$store.commit("setSelectedTime", this.selectedTime);
-      this.$store.commit("setSelectedCourt", this.selectedCourt);
-      this.$store.commit("setCourtDetail", data);
-      console.log(this.$store.state.courtDetail);
-      this.$router.replace("/confirm_booking");
+    createLobby() {
+      this.loading = true
+      let body = {
+        court: this.selectedCourt,
+        time_start: this.selectedTime[0],
+        time_end: this.selectedTime[1],
+      };
+      if (
+        (body.court != "") &
+        (body.time_start != null) &
+        (body.time_end != null)
+      ) {
+        this.$axios
+          .post("http://localhost:4000/createList", body)
+          .then((res) => {
+            this.loading = false
+            this.$router.push({
+                name: "confirm_booking",
+                params: {
+                  code: res.data.code,
+                  court: res.data.court,
+                },
+              });
+          });
+      } else {
+        this.loading = false
+        console.error("error occurred");
+      }
     },
+    // setSelectedCourt() {
+    //   let data = this.court.find((e) => e.Court_id === this.selectedCourt);
+    //   data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
+    //   this.$store.commit("setSelectedTime", this.selectedTime);
+    //   this.$store.commit("setSelectedCourt", this.selectedCourt);
+    //   this.$store.commit("setCourtDetail", data);
+    //   console.log(this.$store.state.courtDetail);
+    //   this.$router.replace("/confirm_booking");
+    // },
     isInRange(value, range) {
       if (this.plotStatus == 1) {
         return true;

@@ -15,7 +15,7 @@
       >
         <v-avatar color="white" size="120">
           <img
-            src="https://sv1.picz.in.th/images/2022/08/19/XeHh6a.jpg"
+            src="https://icit.kmutnb.ac.th/main/wp-content/uploads/2016/05/icit_logo_big.png"
             alt="profilePic"
           />
         </v-avatar>
