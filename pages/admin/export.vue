@@ -179,13 +179,11 @@ export default {
       dialog: false,
       // Modified data structure with name and time properties
       items: [
-        { stadium: "BasketBall", time: "10:00-11:00", count: "5" },
-        { stadium: "BasketBall", time: "09:00-10:00", count: "7" },
-        { stadium: "Football", time: "10:00-11:00", count: "9" },
-        { stadium: "Football", time: "13:00-14:00", count: "20" },
-        { stadium: "Badminton", time: "14:00-15:00", count: "11" },
-        { stadium: "Judo", time: "10:00-11:00", count: "5" },
-        { stadium: "Futsal", time: "10:00-11:00", count: "5" },
+        { stadium: "สนามบาสเก็ตบอล", time: "09:00-10:00", count: "7" },
+        { stadium: "สนามบาสเก็ตบอล", time: "11:00-12:00", count: "9" },
+        { stadium: "สนามบาสเก็ตบอล", time: "13:00-14:00", count: "20" },
+        { stadium: "สนามบาสเก็ตบอล", time: "14:00-15:00", count: "11" },
+        { stadium: "สนามบาสเก็ตบอล", time: "15:00-16:00", count: "5" },
         // Add more items as needed
       ],
       // Your existing data properties

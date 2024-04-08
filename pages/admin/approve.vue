@@ -25,7 +25,14 @@
               :key="index"
               class="pa-3"
             ></th>
-            <th style="background-color: #bebebe">ช่วงเวลา</th>
+            <th style="background-color: #bebebe"></th>
+            <th
+              style="background-color: #ebecf0"
+              v-for="(item, index) in OpsTime.ArrTime"
+              :key="index"
+              class="pa-3"
+            ></th>
+            <th style="background-color: #bebebe"></th>
             <th
               style="background-color: #ebecf0"
               v-for="(item, index) in OpsTime.ArrTime"
@@ -38,32 +45,45 @@
           <tr v-for="(item, index) in lobbyList" :key="index">
             <td class="pa-5" style="background-color: #ebecf0">
               <v-row>
-                <v-avatar class="mt-1" color="red" size="10"></v-avatar>
                 <p class="ml-2">{{ item.stadium }}</p>
               </v-row>
             </td>
             <td class="pa-5" style="background-color: #ebecf0">
               <v-row>
-                <v-avatar class="mt-1" color="red" size="10"></v-avatar>
                 <p class="ml-2">{{ item.name }}</p>
               </v-row>
             </td>
             <td class="pa-5" style="background-color: #ebecf0">
               <v-row>
-                <v-avatar class="mt-1" color="red" size="10"></v-avatar>
                 <p class="ml-2">{{ item.time }}</p>
               </v-row>
             </td>
-             <td class="pa-2" style="background-color: #ebecf0">
-            <v-btn x-small @click="confirmLobby(index)">
-              <v-icon color="green lighten-1">mdi-refresh</v-icon>
-              ยืนยัน
-            </v-btn>
-          </td>
+            <td class="pa-2" style="background-color: #ebecf0">
+              <v-btn x-small @click="confirmLobby(index)"> ยืนยัน </v-btn>
+            </td>
+            <td class="pa-2" style="background-color: #ebecf0">
+              <v-btn x-small @click="openModal">ยกเลิก </v-btn>
+            </td>
           </tr>
         </tbody>
       </template>
     </v-simple-table>
+    <!-- Modal -->
+    <div class="modal" v-if="showModal">
+      <div class="modal-background"></div>
+      <div class="modal-content">
+        <div>
+          <span class="close" @click="closeModal">&times;</span>
+        <h2>สาเหตุที่ต้องการยกเลิก</h2>
+        <p></p>
+        <input type="text" placeholder="สาเหตุที่ต้องการยกเลิก..."  style="width: 300px; height: 100px; ">
+        </div>
+        <div style="paddingTop : 15px">
+          <v-btn x-small @click="showModal = true" style="width: 70px; height: 50px; "> ยืนยัน </v-btn>
+        </div>
+
+      </div>
+    </div>
   </div>
 </template>
 
@@ -87,6 +107,7 @@ export default {
   },
   data() {
     return {
+      showModal: false,
       court: [
         {
           Players: "",
@@ -102,10 +123,30 @@ export default {
       lobbyList: [
         // เข้าหน้าจอนี้แล้วให้ยิง api ไป query database find หา status ที่ยังไม่ได้ approve การจองทุกครั้ง เพื่อให้รู้ได้ว่ามี lobby เข้ามาใหม่หรือไม่
         // ตอนจองให้ส่งเมล์ไปที่ admin เพื่อเป็น notification ให้กับผู้ดูแล
-        { stadium: 'ไม่ว่าง' , name :'a' , time :'2' , idLobby : 'a001' },
-        { stadium: 'ไม่ว่าง' , name :'b' , time :'3' , idLobby : 'a002' },
-        { stadium: 'ไม่ว่าง' , name :'c' , time :'4' , idLobby : 'a003' },
-        { stadium: 'ไม่ว่าง' , name :'d' , time :'5' , idLobby : 'a004' },
+        {
+          stadium: "สนามบาสเก็ตบอล",
+          name: "ณพล ศรีสุวรรณ",
+          time: "09:00 - 10:00",
+          idLobby: "a001",
+        },
+        {
+          stadium: "สนามวอลเลบอล",
+          name: "เดช เดชาบูรพา",
+          time: "11:00 - 12:00",
+          idLobby: "a002",
+        },
+        {
+          stadium: "สนามฟุตซอล",
+          name: "ศุภชัย พีระชัยรัตน์",
+          time: "15:00 - 16:00",
+          idLobby: "a003",
+        },
+        {
+          stadium: "สนามแบตมินตัน",
+          name: "เอก ยิ่งเจริญ",
+          time: "14:00 - 15:00",
+          idLobby: "a004",
+        },
       ],
       listCourt: [],
       selectedCourt: null,
@@ -121,6 +162,12 @@ export default {
   },
 
   methods: {
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
     setSelectedCourt() {
       let data = this.court.find((e) => e.Court_id === this.selectedCourt);
       data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
@@ -133,12 +180,32 @@ export default {
     confirmLobby(index) {
       // Access data based on the index
       const selectedItem = this.lobbyList[index];
-      console.log("Confirmed lobby:", selectedItem , this.lobbyList[index].stadium , index );
-      console.log("Confirmed lobby:", selectedItem , this.lobbyList[index].name , index );
-      console.log("Confirmed lobby:", selectedItem , this.lobbyList[index].time , index );
-      console.log("Confirmed lobby:", selectedItem , this.lobbyList[index].idLobby , index );
+      console.log(
+        "Confirmed lobby:",
+        selectedItem,
+        this.lobbyList[index].stadium,
+        index
+      );
+      console.log(
+        "Confirmed lobby:",
+        selectedItem,
+        this.lobbyList[index].name,
+        index
+      );
+      console.log(
+        "Confirmed lobby:",
+        selectedItem,
+        this.lobbyList[index].time,
+        index
+      );
+      console.log(
+        "Confirmed lobby:",
+        selectedItem,
+        this.lobbyList[index].idLobby,
+        index
+      );
 
-      //pack data and send to database then change status 
+      //pack data and send to database then change status
     },
     isInRange(value, range) {
       if (this.plotStatus == 1) {
@@ -289,5 +356,59 @@ export default {
   border-style: solid;
   border-width: 5px;
   border-color: #ebecf0; */
+}
+
+/* modal */
+.modal {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-background {
+  background-color: rgba(0, 0, 0, 0.4); /* Black background with opacity */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  padding: 20px;
+  border: 1px solid #888;
+  max-width: 80%; /* Set maximum width */
+  max-height: 80%; /* Set maximum height */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+  position: relative; /* Relative position for absolute close button */
+}
+
+.close {
+  color: #aaa;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.textbox {
+  position: absolute;
+  top: 20px;
+  left: 20px;
 }
 </style>
