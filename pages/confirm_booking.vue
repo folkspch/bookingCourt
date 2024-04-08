@@ -251,17 +251,14 @@ export default {
       canceledDialog: false,
       selectedTime: null,
       isHost: false,
+      lobbyData:{}
     };
   },
   methods: {
     sendRequest() {
       console.log(this.user);
-      let check =
-        (this.user.username != undefined) &
-        (this.$store.state.selectedCourt != "");
-
-      if (this.$store.state.courtDetail.Player_strict) {
-        if (this.memberCount < this.$store.state.courtDetail.Players) {
+      if (this.lobbyData.Players_strict) {
+        if (this.memberCount < this.lobbyData.Players) {
           this.errorText = {
             title: "ผู้เล่นไม่ครบตามเกณฑ์",
             text: "สนามนี้จำเป็นต้องมีผู้เล่นครบตามกำหนด",
@@ -274,6 +271,20 @@ export default {
       // มีชื่อในสนามอื่นไหม,คนครบไหม,สนามว่างไหม
       // console.log(this.$store.state.courtDetail);
       if (check) {
+        this.$axios
+        .delete("http://localhost:4000/requestBook", {
+          data: {
+            userId: x,
+            code: this.code,
+            court: this.$store.state.selectedCourt
+              ? this.$store.state.selectedCourt
+              : this.court,
+          },
+        })
+        .then((res) => {
+          console.log(res);
+          this.getLobbyList();
+        });
       }
     },
     checkDelBtn(x) {
@@ -360,8 +371,8 @@ export default {
           court: this.$store.state.selectedCourt
             ? this.$store.state.selectedCourt
             : this.court,
-          courtName: this.$store.state.courtDetail.Name_th,
-          time: this.$store.state.courtDetail.time,
+          courtName: this.courtDetail.Name_th,
+          time: this.selectedTime,
         })
         .then((res) => {
           console.log(res);
@@ -386,7 +397,6 @@ export default {
           return;
         }
         this.btnLoading = true;
-        const token = "jnNJKFFN9-X55FNmqmLazn1B47BlYmw7";
         var body = {
           username: this.inputID,
         };
@@ -422,29 +432,29 @@ export default {
       //     console.log("temp ", this.temp);
       //   });
     },
-    createLobby() {
-      let body = {
-        court: this.$store.state.selectedCourt,
-        time_start: this.$store.state.selectedTime.time_start,
-        time_end: this.$store.state.selectedTime.time_end,
-      };
-      console.log('body', body);
-      if (
-        (body.court != "") &
-        (body.time_start != null) &
-        (body.time_end != null)
-      ) {
-        this.$axios
-          .post("http://localhost:4000/createList", body)
-          .then((res) => {
-            this.code = res.data.code;
-            this.getLobbyList();
-          });
-      } else {
-        // this.$router.replace("/booking");
-        console.error("error occurred");
-      }
-    },
+    // createLobby() {
+    //   let body = {
+    //     court: this.$store.state.selectedCourt,
+    //     time_start: this.$store.state.selectedTime.time_start,
+    //     time_end: this.$store.state.selectedTime.time_end,
+    //   };
+    //   console.log('body', body);
+    //   if (
+    //     (body.court != "") &
+    //     (body.time_start != null) &
+    //     (body.time_end != null)
+    //   ) {
+    //     this.$axios
+    //       .post("http://localhost:4000/createList", body)
+    //       .then((res) => {
+    //         this.code = res.data.code;
+    //         this.getLobbyList();
+    //       });
+    //   } else {
+    //     // this.$router.replace("/booking");
+    //     console.error("error occurred");
+    //   }
+    // },
     getLobbyList() {
       let body = {
         court: this.court,
@@ -453,20 +463,21 @@ export default {
       if (body.code != "" && body.court != "") {
         this.$axios
           .post("http://localhost:4000/getLobbyData", body)
-          .then((res) => {
-            console.log(res, "resss");
-            this.selectedTime = `${res.data[0].Time_start} - ${res.data[0].Time_end}`
+          .then((response) => {
+            this.lobbyData = response.data.lobbyData
+            let res = response.data.lobbyList
+            this.selectedTime = `${this.lobbyData.Time_start} - ${this.lobbyData.Time_end}`
             this.inviteList = [];
-            for (let i = 0; i < res.data.length; i++) {
-              if (res.data[i].Invite_status === 'Host' && res.data[i].User_id === this.$auth.user.user_id) {
+            for (let i = 0; i < res.length; i++) {
+              if (res[i].Invite_status === 'Host' && res[i].User_id === this.$auth.user.user_id) {
                 this.isHost = true
               }
-              this.playerCondition.player = res.data[0].Players;
-              this.playerCondition.player_strict = res.data[0].Players_strict;
+              this.playerCondition.player = res[0].Players;
+              this.playerCondition.player_strict = res[0].Players_strict;
               this.inviteList.push({
-                id: res.data[i].User_id,
-                name: res.data[i].User_name,
-                status: res.data[i].Invite_status,
+                id: res[i].User_id,
+                name: res[i].User_name,
+                status: res[i].Invite_status,
               });
             }
             this.memberCount = 0;
@@ -484,14 +495,12 @@ export default {
       }
     },
     pollData() {
-      if (this.user.username != undefined && this.$store.state.selectedCourt) {
         this.interval = setInterval(() => {
           if (this.code) {
             this.getLobbyList();
             console.log("getlb");
           }
         }, 5000);
-      }
     },
     cancelBook(btn) {
       this.dialogCancel = false

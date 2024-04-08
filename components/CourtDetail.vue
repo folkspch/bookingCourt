@@ -1,9 +1,9 @@
 <template>
   <div id="card">
     <v-card
-      v-if="selectedCourt != null & this.court.length!=0"
+      v-if="(selectedCourt != null) & (this.court.length != 0)"
       :class="classPage"
-      style="padding: 20px;"
+      style="padding: 20px"
       max-width="60%"
       elevation="3"
       light
@@ -11,19 +11,43 @@
       <!-- {{ this.data[selectedID].Description_th }} -->
       <v-card-title>รายละเอียดสนาม</v-card-title>
       <div class="mx-auto">
-        <v-card-text >
+        <v-card-text>
           <p>
-            ชื่อสนาม : {{ this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Name_th }}
+            ชื่อสนาม :
+            {{
+              this.court[
+                parseInt(this.selectedCourt ? this.selectedCourt : this.Court) -
+                  1
+              ].Name_th
+            }}
           </p>
           <p>
-            ชนิดสนามกีฬา : {{ this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Type_th }}
+            ชนิดสนามกีฬา :
+            {{
+              this.court[
+                parseInt(this.selectedCourt ? this.selectedCourt : this.Court) -
+                  1
+              ].Type_th
+            }}
           </p>
           <p>
-            สถานที่ตั้ง : {{ this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Place_th }}
+            สถานที่ตั้ง :
+            {{
+              this.court[
+                parseInt(this.selectedCourt ? this.selectedCourt : this.Court) -
+                  1
+              ].Place_th
+            }}
           </p>
           <p>
             จำนวนผู้เล่นขั้นต่ำ :
-            {{ this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Players }} คน
+            {{
+              this.court[
+                parseInt(this.selectedCourt ? this.selectedCourt : this.Court) -
+                  1
+              ].Players
+            }}
+            คน
           </p>
           <p v-if="this.selectedTime">
             ช่วงเวลาที่ต้องการจอง :
@@ -33,7 +57,11 @@
       </div>
       <v-img
         :max-width="this.mw"
-        :src="this.court[parseInt(this.selectedCourt ? this.selectedCourt: this.Court) - 1].Img"
+        :src="
+          this.court[
+            parseInt(this.selectedCourt ? this.selectedCourt : this.Court) - 1
+          ].Img
+        "
       >
       </v-img>
       <!-- {{selectedID}} -->
@@ -48,34 +76,31 @@ export default {
     return {
       mw: "500px",
       classPage: "",
-      court:[],
-      COURT:null
+      court: [],
+      COURT: null,
     };
   },
   props: {
     Court: String,
     selectedCourt: String,
     page: String,
-    selectedTime:String
+    selectedTime: String,
   },
   methods: {
-    getCourtList(){
-       this.$axios
-        .get("http://localhost:4000/getCourtData")
-        .then((res) => {
-          this.court=res.data
-          if(!this.$store.state.courtDetail.Players){
-            this.$store.commit("setCourtDetail", res.data);
-          }
-        });
+    getCourtList() {
+      this.$axios.get("http://localhost:4000/getCourtData").then((res) => {
+        this.court = res.data;
+        // if(!this.$store.state.courtDetail.Players){
+        //   this.$store.commit("setCourtDetail", res.data);
+        // }
+      });
     },
   },
   mounted() {
-    if(!this.selectedCourt){
-      this.COURT = this.court
-    }
-    else{
-      this.COURT = this.selectedCourt
+    if (!this.selectedCourt) {
+      this.COURT = this.court;
+    } else {
+      this.COURT = this.selectedCourt;
     }
     if (this.page === "timetable") {
       this.classPage = "mx-auto d-flex mt-5";
@@ -83,7 +108,7 @@ export default {
     }
   },
   created() {
-    this.getCourtList()
+    this.getCourtList();
   },
 };
 </script>

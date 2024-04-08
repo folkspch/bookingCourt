@@ -111,19 +111,19 @@
                 <v-card-text>
                   <p>
                     ชื่อสนาม :
-                    {{ this.court[parseInt(this.selectedCourt) - 1].Name_th }}
+                    {{ this.selectedCourtData.Name_th }}
                   </p>
                   <p>
                     ชนิดกีฬา :
-                    {{ this.court[parseInt(this.selectedCourt) - 1].Type_th }}
+                    {{ this.selectedCourtData.Type_th }}
                   </p>
                   <p>
                     ที่อยู่สนาม :
-                    {{ this.court[parseInt(this.selectedCourt) - 1].Place_th }}
+                    {{ this.selectedCourtData.Place_th }}
                   </p>
                   <p>
                     จำนวนผู้เล่นขั้นต่ำ :
-                    {{ this.court[parseInt(this.selectedCourt) - 1].Players }}
+                    {{ this.selectedCourtData.Players }}
                     คน
                   </p>
                   <p>
@@ -134,7 +134,7 @@
               </v-col>
               <v-col cols="6">
                 <v-img
-                  :src="this.court[parseInt(this.selectedCourt) - 1].Img"
+                  :src="this.selectedCourtData.Img"
                   max-width="250"
                   class="my-auto mx-auto"
                 ></v-img>
@@ -185,11 +185,14 @@ export default {
         let courtt = [];
         courtt = res.data;
         let listCourtt = [];
+        let list = []
         for (let i = 0; i < courtt.length; i++) {
-          listCourtt[i] = courtt[i].Name_th;
+          if(courtt[i].is_available == true){
+            list.push(courtt[i])
+          }
         }
         return {
-          court: courtt,
+          court: list,
           listCourt: listCourtt,
         };
       });
@@ -218,7 +221,8 @@ export default {
       timeChoice: [],
       invite_code: null,
       dialog: false,
-      loading:false
+      loading:false,
+      selectedCourtData:null
     };
   },
 
@@ -277,7 +281,10 @@ export default {
         url: `http://localhost:4000/getBookingData/${today}/${this.selectedCourt}`,
         method: "GET",
       };
-      var courtDetail = this.court[parseInt(this.selectedCourt) - 1];
+      const courtDetail = this.court.find(item => item.Court_id == this.selectedCourt);
+      this.selectedCourtData = courtDetail
+      // var courtDetail = this.selectedCourtData;
+      console.log("courtDetail",courtDetail);
       var OpsHour =
         parseInt(courtDetail.TimeClose.substring(0, 2)) -
         parseInt(courtDetail.TimeOpen.substring(0, 2));
@@ -321,11 +328,12 @@ export default {
       console.log("SET");
       this.OpsTime.ArrTime = [];
       this.selectedTime = null;
+      const courtDetail = this.court.find(item => item.Court_id == this.selectedCourt);
       this.OpsTime.OpenTime = parseInt(
-        this.court[parseInt(this.selectedCourt) - 1].TimeOpen.substring(0, 2)
+        courtDetail.TimeOpen.substring(0, 2)
       );
       this.OpsTime.CloseTime = parseInt(
-        this.court[parseInt(this.selectedCourt) - 1].TimeClose.substring(0, 2)
+        courtDetail.TimeClose.substring(0, 2)
       );
       console.log("ggin", this.OpsTime.OpenTime, this.OpsTime.CloseTime);
       for (let i = this.OpsTime.OpenTime; i < this.OpsTime.CloseTime; i++) {
