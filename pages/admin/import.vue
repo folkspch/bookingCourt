@@ -71,8 +71,6 @@ export default {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-        // Skip header, only read cells with data, and filter out rows with empty "stadium" field
         this.excelData = jsonData.slice(1)
           .filter(row => row[0] !== undefined && row[0] !== null && row[0] !== '')
           .map((row, id) => ({
@@ -91,7 +89,6 @@ export default {
       reader.readAsArrayBuffer(file);
     },
     formatTime(time) {
-      // Convert Excel time to HH:mm format
       if (typeof time === 'number') {
         const totalMinutes = Math.round(time * 24 * 60);
         const hours = Math.floor(totalMinutes / 60);
@@ -106,10 +103,6 @@ export default {
       console.log("--> Stadium:", this.dataBooking[0]?.stadium || 'N/A');
       console.log("--> Day:", this.dataBooking[0]?.day || 'N/A');
       console.log("--> Time Start:", this.dataBooking[0]?.timeStart || 'N/A');
-    },
-    editRow(row) {
-      // You can add custom logic here if needed when the row is edited
-      console.log("Edited row:", row);
     },
   },
 };
