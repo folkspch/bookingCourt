@@ -71,12 +71,11 @@
         </v-row>
       </v-col>
     </v-row>
-    <!-- Add a button to trigger export -->
-    <v-btn @click="exportData()">Export Data</v-btn>
+    <!-- <v-btn @click="exportData()">Export Data</v-btn> -->
 
     <!-- Display simple data -->
     <div v-if="items.length">
-      <h2>Items</h2>
+      <h2> Data </h2>
       <table class="items-table">
         <thead>
           <tr>
@@ -94,7 +93,9 @@
         </tbody>
       </table>
     </div>
-
+<v-btn @click="exportData()" class="export-button">
+      Export Data
+    </v-btn>
     <!-- Your existing template code -->
     <!-- ... -->
   </div>
@@ -375,21 +376,85 @@ export default {
 .items-table {
   width: 100%;
   border-collapse: collapse;
+  background-color: #f9fafb; /* Soft off-white background */
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0; /* Light grey border for the entire table */
 }
 
 .items-table th,
 .items-table td {
-  padding: 8px;
-  border: 1px solid #ddd;
+  padding: 12px 15px;
+  border: 1px solid #e0e0e0; /* Light grey border for cells */
   text-align: left;
 }
 
 .items-table th {
-  background-color: #f2f2f2;
+  background-color: #eceff1; /* Light grey-blue for the header */
   font-weight: bold;
+  text-transform: uppercase;
+  color: #37474f; /* Darker grey-blue text for contrast */
 }
 
 .items-table tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #f1f8e9; /* Very light green for even rows */
+}
+
+.items-table tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* White for odd rows */
+}
+
+/* Styling for the export button */
+.export-button {
+  position: fixed;
+  bottom: 40px;
+  right: 20px;
+  background-color: #78909c; /* Soft blue-grey for the button */
+  color: #ffffff;
+  border-radius: 4px;
+  padding: 10px 20px;
+  box-shadow: none; /* No shadow for simplicity */
+}
+
+/* Input fields styling */
+.orange-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e0e0e0; /* Light grey border */
+  border-radius: 4px;
+}
+
+.orange-input:focus {
+  border-color: #90caf9; /* Soft blue on focus for consistency */
+  outline: none;
+}
+
+/* Select fields styling */
+.v-select .v-input__control {
+  border-color: #e0e0e0; /* Light grey border */
+}
+
+.v-select .v-input__control:focus-within {
+  border-color: #90caf9 !important; /* Soft blue on focus */
+}
+
+/* General styling */
+.v-row {
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 1.5em;
+  color: #37474f; /* Dark grey-blue text */
+  margin-bottom: 15px;
+}
+
+/* Button styling */
+.v-btn {
+  background-color: #90caf9; /* Soft blue */
+  color: #11ff00;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 4px;
 }
 </style>

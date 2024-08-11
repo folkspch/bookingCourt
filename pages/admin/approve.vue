@@ -1,87 +1,59 @@
 <template>
   <div>
-    <v-simple-table class="mb-5">
+    <v-simple-table class="mb-5 custom-table">
       <template v-slot:default>
         <thead>
           <tr>
-            <th style="background-color: #bebebe">สนาม</th>
-            <th
-              style="background-color: #ebecf0"
-              v-for="(item, index) in OpsTime.ArrTime"
-              :key="index"
-              class="pa-3"
-            ></th>
-            <th style="background-color: #bebebe">ชื่อผู้จอง</th>
-            <th
-              style="background-color: #ebecf0"
-              v-for="(item, index) in OpsTime.ArrTime"
-              :key="index"
-              class="pa-3"
-            ></th>
-            <th style="background-color: #bebebe">ช่วงเวลา</th>
-            <th
-              style="background-color: #ebecf0"
-              v-for="(item, index) in OpsTime.ArrTime"
-              :key="index"
-              class="pa-3"
-            ></th>
-            <th style="background-color: #bebebe"></th>
-            <th
-              style="background-color: #ebecf0"
-              v-for="(item, index) in OpsTime.ArrTime"
-              :key="index"
-              class="pa-3"
-            ></th>
-            <th style="background-color: #bebebe"></th>
-            <th
-              style="background-color: #ebecf0"
-              v-for="(item, index) in OpsTime.ArrTime"
-              :key="index"
-              class="pa-3"
-            ></th>
+            <th class="header-cell">สนาม</th>
+            <th v-for="(item, index) in OpsTime.ArrTime" :key="index" class="header-cell"></th>
+            <th class="header-cell">ชื่อผู้จอง</th>
+            <th v-for="(item, index) in OpsTime.ArrTime" :key="index" class="header-cell"></th>
+            <th class="header-cell">ช่วงเวลา</th>
+            <th v-for="(item, index) in OpsTime.ArrTime" :key="index" class="header-cell"></th>
+            <th class="header-cell"></th>
+            <th v-for="(item, index) in OpsTime.ArrTime" :key="index" class="header-cell"></th>
+            <th class="header-cell"></th>
+            <th v-for="(item, index) in OpsTime.ArrTime" :key="index" class="header-cell"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in lobbyList" :key="index">
-            <td class="pa-5" style="background-color: #ebecf0">
+          <tr v-for="(item, index) in lobbyList" :key="index" class="body-row">
+            <td class="body-cell">
               <v-row>
                 <p class="ml-2">{{ item.stadium }}</p>
               </v-row>
             </td>
-            <td class="pa-5" style="background-color: #ebecf0">
+            <td class="body-cell">
               <v-row>
                 <p class="ml-2">{{ item.name }}</p>
               </v-row>
             </td>
-            <td class="pa-5" style="background-color: #ebecf0">
+            <td class="body-cell">
               <v-row>
                 <p class="ml-2">{{ item.time }}</p>
               </v-row>
             </td>
-            <td class="pa-2" style="background-color: #ebecf0">
-              <v-btn x-small @click="confirmLobby(index)"> ยืนยัน </v-btn>
+            <td class="body-cell action-cell">
+              <v-btn x-small color="success" class="confirm-button" @click="confirmLobby(index)"> ยืนยัน </v-btn>
             </td>
-            <td class="pa-2" style="background-color: #ebecf0">
-              <v-btn x-small @click="openModal">ยกเลิก </v-btn>
+            <td class="body-cell action-cell">
+              <v-btn x-small color="error" class="cancel-button" @click="openModal">ยกเลิก </v-btn>
             </td>
           </tr>
         </tbody>
       </template>
     </v-simple-table>
+
     <!-- Modal -->
     <div class="modal" v-if="showModal">
-      <div class="modal-background"></div>
+      <div class="modal-background" @click="closeModal"></div>
       <div class="modal-content">
-        <div>
-          <span class="close" @click="closeModal">&times;</span>
+        <span class="close" @click="closeModal">&times;</span>
         <h2>สาเหตุที่ต้องการยกเลิก</h2>
-        <p></p>
-        <input type="text" placeholder="สาเหตุที่ต้องการยกเลิก..."  style="width: 300px; height: 100px; ">
+        <textarea placeholder="สาเหตุที่ต้องการยกเลิก..." class="cancel-reason-input"></textarea>
+        <div class="modal-actions">
+          <v-btn x-small color="green" class="confirm-button" @click="showModal = false"> ยืนยัน </v-btn>
         </div>
-        <div style="paddingTop : 15px">
-          <v-btn x-small @click="showModal = true" style="width: 70px; height: 50px; "> ยืนยัน </v-btn>
-        </div>
-
       </div>
     </div>
   </div>
@@ -332,83 +304,103 @@ export default {
 </script>
 
 <style scoped>
-.reserved {
-  background-color: #f44336;
-  border-style: solid;
-  border-width: 5px;
-  border-color: #ebecf0;
-}
-.inProgress {
-  background-color: #2196f3;
-  border-style: solid;
-  border-width: 5px;
-  border-color: #ebecf0;
-}
-.free {
-  background-color: #4caf50;
-  border-style: solid;
-  border-width: 5px;
-  border-color: #ebecf0;
-}
-.none {
-  all: unset;
-  /* background-color: #ebecf0;
-  border-style: solid;
-  border-width: 5px;
-  border-color: #ebecf0; */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-/* modal */
+.header-cell {
+  background-color: #455a64; /* Medium blue-gray for the header */
+  color: #ffffff; /* White text color */
+  padding: 8px;
+  text-align: center;
+}
+
+.body-row:nth-child(even) {
+  background-color: #e3f2fd; /* Very light blue for even rows */
+}
+
+.body-row:nth-child(odd) {
+  background-color: #ffffff; /* White for odd rows */
+}
+
+.body-cell {
+  padding: 8px;
+  text-align: center;
+  color: #37474f; /* Dark blue-gray text */
+}
+
+.action-cell {
+  padding: 4px;
+}
+
+.confirm-button {
+  background-color: #66bb6a !important; /* Soft green */
+  color: #ffffff !important;
+}
+
+.cancel-button {
+  background-color: #ef5350 !important; /* Soft red */
+  color: #ffffff !important;
+}
+
 .modal {
   position: fixed;
-  z-index: 1;
-  left: 0;
   top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .modal-background {
-  background-color: rgba(0, 0, 0, 0.4); /* Black background with opacity */
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
-  background-color: #fefefe;
+  position: relative;
+  background-color: #fafafa;
   padding: 20px;
-  border: 1px solid #888;
-  max-width: 80%; /* Set maximum width */
-  max-height: 80%; /* Set maximum height */
-  overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
-  position: relative; /* Relative position for absolute close button */
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .close {
-  color: #aaa;
   position: absolute;
   top: 10px;
   right: 10px;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
+  font-size: 24px;
   cursor: pointer;
+  color: #d32f2f; /* Red color for the close button */
 }
 
-.textbox {
-  position: absolute;
-  top: 20px;
-  left: 20px;
+.cancel-reason-input {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: none;
+}
+
+.modal-actions {
+  margin-top: 15px;
+  text-align: right;
+}
+
+.modal-actions v-btn {
+  width: 70px;
+  height: 40px;
 }
 </style>
