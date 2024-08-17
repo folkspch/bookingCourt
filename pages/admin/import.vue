@@ -119,6 +119,7 @@ export default {
       excelData: [],
       dateTimeStart: "",
       dateTimeEnd: "",
+      dataGroup : "",
     };
   },
   methods: {
@@ -132,60 +133,106 @@ export default {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-    console.log(jsonData);
 
+    // Convert Excel data to the format you need
     const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
-    const groupedList = jsonData
+    const rawData = jsonData.slice(1)
+      .filter(row => row.some(cell => cell !== undefined && cell !== null && cell !== "")) // Filter out empty rows
+      .map((row, id) => {
+        return {
+          id,
+          days: daysOfWeek[id % daysOfWeek.length],
+          data8to9: row[1] || "a11",
+          data9to10: row[2] || "a11",
+          data10to11: row[3] || "a11",
+          data11to12: row[4] || "a11",
+          data12to13: row[5] || "a11",
+          data13to14: row[6] || "a11",
+          data14to15: row[7] || "a11",
+          data15to16: row[8] || "a11",
+          data16to17: row[9] || "a11",
+          data17to18: row[10] || "a11",
+          data18to19: row[11] || "a11",
+          data19to20: row[12] || "a11",
+        };
+      });
+
+    // Now group the data by day using the previously defined function
+    
+    this.dataGroup = this.groupDataByDay(rawData);
+    this.excelData = jsonData
       .slice(1) // Skip header row
       .filter(row => row.some(cell => cell !== undefined && cell !== null && cell !== "")) // Filter out empty rows
       .map((row, id) => {
         const dayOfWeek = daysOfWeek[id % daysOfWeek.length]; // Map each row to a day of the week based on the order
 
-        // Group consecutive identical values
-        const groupedData = this.groupData(row);
-        console.log("groupedData",groupedData);
-        
         return {
           id,
-          days: dayOfWeek,
-          groupedData,
+          days: dayOfWeek,   // Assign the day of the week based on the row order
+          data8to9: row[1] || "a11",
+          data9to10: row[2] || "a11",
+          data10to11: row[3] || "a11",
+          data11to12: row[4] || "a11",
+          data12to13: row[5] || "a11",
+          data13to14: row[6] || "a11",
+          data14to15: row[7] || "a11",
+          data15to16: row[8] || "a11",
+          data16to17: row[9] || "a11",
+          data17to18: row[10] || "a11",
+          data18to19: row[11] || "a11",
+          data19to20: row[12] || "a11",
         };
       });
-
-    this.excelData = groupedList; // Update the excelData with the grouped list
-    console.log("Grouped Data", this.excelData);
+        console.log("Grouped Data:", JSON.stringify(this.dataGroup, null, 2));
   };
   reader.readAsArrayBuffer(file);
 },
 
-groupData(row) {
-  const groupedData = [];
-  let currentGroup = { timeRange: '08:00-09:00', value: row[1] };
-  const timeSlots = [
-    '08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00',
-    '12:00-13:00', '13:00-14:00', '14:00-15:00', '15:00-16:00',
-    '16:00-17:00', '17:00-18:00', '18:00-19:00', '19:00-20:00'
-  ];
+groupDataByDay(dataArray) {
+  return dataArray.map(dayData => {
+    const timeSlots = [
+      { key: 'data8to9', label: '08:00-09:00' },
+      { key: 'data9to10', label: '09:00-10:00' },
+      { key: 'data10to11', label: '10:00-11:00' },
+      { key: 'data11to12', label: '11:00-12:00' },
+      { key: 'data12to13', label: '12:00-13:00' },
+      { key: 'data13to14', label: '13:00-14:00' },
+      { key: 'data14to15', label: '14:00-15:00' },
+      { key: 'data15to16', label: '15:00-16:00' },
+      { key: 'data16to17', label: '16:00-17:00' },
+      { key: 'data17to18', label: '17:00-18:00' },
+      { key: 'data18to19', label: '18:00-19:00' },
+      { key: 'data19to20', label: '19:00-20:00' }
+    ];
 
-  for (let i = 1; i <= 12; i++) {
-    const currentValue = row[i];
+    const groupedData = [];
+    let currentGroup = { timeRange: timeSlots[0].label, value: dayData[timeSlots[0].key] };
+    let startTimeIndex = 0;
 
-    if (currentValue === currentGroup.value) {
-      // Extend the current group time range
-      currentGroup.timeRange = `${currentGroup.timeRange.split('-')[0]}-${timeSlots[i].split('-')[1]}`;
-    } else {
-      // Save the current group and start a new one
-      groupedData.push({ ...currentGroup });
-      currentGroup = { timeRange: timeSlots[i], value: currentValue };
+    for (let i = 1; i < timeSlots.length; i++) {
+      const currentValue = dayData[timeSlots[i].key];
+
+      if (currentValue === currentGroup.value) {
+        // Extend the current group time range
+        currentGroup.timeRange = `${timeSlots[startTimeIndex].label.split('-')[0]}-${timeSlots[i].label.split('-')[1]}`;
+      } else {
+        // Push the current group and start a new one
+        groupedData.push({ ...currentGroup });
+        startTimeIndex = i;
+        currentGroup = { timeRange: timeSlots[i].label, value: currentValue };
+      }
     }
-  }
 
-  // Push the last group
-  groupedData.push({ ...currentGroup });
+    // Push the last group
+    groupedData.push({ ...currentGroup });
 
-  return groupedData;
-
+    return {
+      id: dayData.id,
+      days: dayData.days,
+      groupedData: groupedData
+    };
+  });
 },
     formatTime(time) {
       if (typeof time === "number") {
@@ -219,6 +266,8 @@ groupData(row) {
       console.log("--> Stadium:", this.dataBooking[0]?.stadium || "N/A");
       console.log("--> Day:", this.dataBooking[0]?.day || "N/A");
       console.log("--> Time Start:", this.dataBooking[0]?.timeStart || "N/A");
+      console.log("Grouped Data:", JSON.stringify(this.dataGroup, null, 2));
+      
     },
     
   },
