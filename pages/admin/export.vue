@@ -21,7 +21,7 @@
             <v-select
               hide-details
               item-color="orange"
-              label="เลือกระยะเวลาที่ต้องการจอง"
+              label="เลือกระยะเวลาเริ่ม"
               v-model="selectedTimeA"
               :items="timeChoice"
               item-text="time"
@@ -38,7 +38,7 @@
             <v-select
               hide-details
               item-color="orange"
-              label="เลือกระยะเวลาที่ต้องการจอง"
+              label="เลือกระยะเวลาสิ้นสุด"
               v-model="selectedTimeB"
               :items="timeChoice.filter((item) => item.time >= selectedTimeA)"
               item-text="time"
@@ -75,7 +75,7 @@
 
     <!-- Display simple data -->
     <div v-if="items.length">
-      <h2> Data </h2>
+      <h2>Data</h2>
       <table class="items-table">
         <thead>
           <tr>
@@ -93,14 +93,11 @@
         </tbody>
       </table>
     </div>
-<v-btn @click="exportData()" class="export-button">
-      Export Data
-    </v-btn>
+    <v-btn @click="exportData()" class="export-button"> Export Data </v-btn>
     <!-- Your existing template code -->
     <!-- ... -->
   </div>
 </template>
-
 
 <script>
 import CourtDetail from "@/components/CourtDetail.vue";
@@ -135,7 +132,7 @@ export default {
       selectedTimeA: "",
       selectedTimeB: "",
       dateChoices: [], // Define dateChoices array
-      
+
       timeChoice: [
         { time: "09:00" },
         { time: "10:00" },
@@ -241,6 +238,35 @@ export default {
       console.log(this.selectedTimeB);
       console.log(this.selectedDateA);
       console.log(this.selectedDateB);
+
+      if (!this.selectedCourt || (!this.selectedDateA && !this.selectedDateB)) {
+        alert("Please select a court and a date range");
+        return;
+      }
+
+      // Prepare query parameters for court_id, start_date, and end_date
+      const params = {
+        court_id: this.selectedCourt,
+        time_start: this.selectedTimeA || null,
+        time_end: this.selectedTimeB || null,
+        start_date: this.selectedDateA || null, // If only one date is provided, set the other as null
+        end_date: this.selectedDateB || null,
+      };
+    console.log("asdsad",params);
+
+    
+      // Send a GET request to the backend with the query parameters
+      this.$axios
+        .get("http://localhost:4000/getCourtDataBooking", { params })
+        .then((response) => {
+          // Update the items with the received data
+          this.items = response.data.data;
+          console.log("Received data:", response);
+          console.log("Received data:", this.items);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
       // query data ตาม field สนาม และ เวลา
     },
     setSelectedCourt() {
