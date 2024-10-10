@@ -262,7 +262,7 @@ export default {
           // Update the items with the received data
           this.items = response.data.data;
           console.log("Received data:", response);
-          console.log("Received data:", this.items);
+          console.log("Received data items:", this.items);
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
