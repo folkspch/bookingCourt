@@ -186,10 +186,34 @@ export default {
     closeCancelModal() {
       this.showCancelModal = false; // Close the cancellation modal
     },
-    openConfirmationModal(idLobby) {
-      this.selectedLobbyId = idLobby; // Store the clicked lobby ID
-      this.showConfirmationModal = true; // Show the confirmation modal
+   openConfirmationModal(idLobby) {
+  this.selectedLobbyId = idLobby; // Store the clicked lobby ID
+  console.log(idLobby);
+
+  // Immediately send the POST request to confirm the booking when the modal is opened
+  const options = {
+    url: `http://localhost:4000/confirmBookingAdmin`, // Backend endpoint
+    method: "POST",
+    data: {
+      idLobby: this.selectedLobbyId, // Send the selected lobby ID for confirmation
     },
+  };
+
+  // Make the Axios POST request to confirm the booking
+  this.$axios(options)
+    .then((res) => {
+      console.log("Booking confirmed:", res.data);
+      this.showConfirmationModal = false; // Close the confirmation modal if successful
+      // Optionally refresh the list or notify the user
+    })
+    .catch((error) => {
+      console.error("Error confirming booking: ", error);
+    });
+
+  // Optionally, show the modal, though in this case, the confirmation happens directly
+  this.showConfirmationModal = true;
+},
+
     closeConfirmationModal() {
       this.showConfirmationModal = false; // Close the confirmation modal
     },
