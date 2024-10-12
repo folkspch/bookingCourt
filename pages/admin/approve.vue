@@ -12,11 +12,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr 
-            v-for="(item, index) in lobbyList" 
-            :key="index" 
+          <tr
+            v-for="(item, index) in lobbyList"
+            :key="index"
             class="body-row"
-            @click="logLobbyId(item.idLobby)"  
+            @click="logLobbyId(item.idLobby)"
           >
             <td class="body-cell">
               <v-row>
@@ -34,10 +34,23 @@
               </v-row>
             </td>
             <td class="body-cell action-cell">
-              <v-btn x-small color="success" class="confirm-button" @click.stop="openConfirmationModal(item.idLobby)"> ยืนยัน </v-btn>
+              <v-btn
+                x-small
+                color="success"
+                class="confirm-button"
+                @click.stop="openConfirmationModal(item.idLobby)"
+              >
+                ยืนยัน
+              </v-btn>
             </td>
             <td class="body-cell action-cell">
-              <v-btn x-small color="error" class="cancel-button" @click.stop="openCancelModal(item.idLobby)">ยกเลิก </v-btn>
+              <v-btn
+                x-small
+                color="error"
+                class="cancel-button"
+                @click.stop="openCancelModal(item.idLobby)"
+                >ยกเลิก
+              </v-btn>
             </td>
           </tr>
         </tbody>
@@ -63,7 +76,9 @@
             <strong>Court:</strong>
           </v-col>
           <v-col cols="8">
-            {{ filteredJoinList.length > 0 ? filteredJoinList[0].court : 'N/A' }}
+            {{
+              filteredJoinList.length > 0 ? filteredJoinList[0].court : "N/A"
+            }}
           </v-col>
         </v-row>
         <v-row>
@@ -71,7 +86,7 @@
             <strong>Time:</strong>
           </v-col>
           <v-col cols="8">
-            {{ filteredJoinList.length > 0 ? filteredJoinList[0].time : 'N/A' }}
+            {{ filteredJoinList.length > 0 ? filteredJoinList[0].time : "N/A" }}
           </v-col>
         </v-row>
         <v-row>
@@ -81,13 +96,52 @@
           <v-col cols="8">
             <ul>
               <li v-for="(item, index) in filteredJoinList" :key="index">
-                {{ item.name }} - {{item.id}}
+                {{ item.name }} - {{ item.id }}
               </li>
             </ul>
           </v-col>
         </v-row>
         <div class="modal-actions">
-          <v-btn x-small color="blue" class="confirm-button" @click="closeLogModal"> ปิด </v-btn>
+          <v-btn
+            x-small
+            color="blue"
+            class="confirm-button"
+            @click="closeLogModal"
+          >
+            ปิด
+          </v-btn>
+        </div>
+      </div>
+    </div>
+     <div class="modal" v-if="showCancelModal">
+      <div class="modal-background" @click="closeCancelModal"></div>
+      <div class="modal-content large-modal">
+        <span class="close" @click="closeCancelModal">&times;</span>
+        <h2>Reject Booking</h2>
+        <v-row>
+          <v-col cols="4">
+            <strong>Reason for Rejection:</strong>
+          </v-col>
+          <v-col cols="8">
+            <v-text-field
+              v-model="cancelReason"
+              label="Enter rejection reason"
+              outlined
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <div class="modal-actions">
+          <v-btn
+            x-small
+            color="red"
+            class="confirm-button"
+            @click="confirmCancelBooking"
+          >
+            ยืนยันการยกเลิก
+          </v-btn>
+          <v-btn x-small color="blue" class="confirm-button" @click="closeCancelModal">
+            ปิด
+          </v-btn>
         </div>
       </div>
     </div>
@@ -101,6 +155,7 @@ export default {
       showLogModal: false, // For showing log modal
       showCancelModal: false, // For cancellation modal
       showConfirmationModal: false, // For confirmation modal
+      cancelReason: "",
       selectedLobbyId: null, // To store the selected lobby ID
       filteredJoinList: [], // To store the filtered data from joinList
       court: [],
@@ -133,37 +188,37 @@ export default {
       joinList: [
         {
           id: "1",
-          court : "02",
+          court: "02",
           name: "ณพล ศรีสุวรรณ",
           idLobby: "ASD123",
-          time : "09:00 - 10:00"
+          time: "09:00 - 10:00",
         },
         {
           id: "2",
-          court : "02",
+          court: "02",
           name: "เดช เดชาบูรพา",
           idLobby: "ASD123",
-          time : "11:00 - 12:00"
+          time: "11:00 - 12:00",
         },
         {
           id: "3",
-          court : "02",
+          court: "02",
           name: "ศุภชัย พีระชัยรัตน์",
           idLobby: "ASD123",
-          time : "15:00 - 16:00"
+          time: "15:00 - 16:00",
         },
         {
           id: "4",
-          court : "02",
+          court: "02",
           name: "เอก ยิ่งเจริญ",
           idLobby: "ASD123",
-          time : "14:00 - 15:00"
-        }
+          time: "14:00 - 15:00",
+        },
       ],
       OpsTime: { OpenTime: null, CloseTime: null, ArrTime: [] },
     };
   },
-   mounted() {
+  mounted() {
     this.API();
   },
   methods: {
@@ -186,67 +241,89 @@ export default {
     closeCancelModal() {
       this.showCancelModal = false; // Close the cancellation modal
     },
-   openConfirmationModal(idLobby) {
-  this.selectedLobbyId = idLobby; // Store the clicked lobby ID
-  console.log(idLobby);
+    openConfirmationModal(idLobby) {
+      this.selectedLobbyId = idLobby; // Store the clicked lobby ID
+      console.log(idLobby);
 
-  // Immediately send the POST request to confirm the booking when the modal is opened
-  const options = {
-    url: `http://localhost:4000/confirmBookingAdmin`, // Backend endpoint
-    method: "POST",
-    data: {
-      idLobby: this.selectedLobbyId, // Send the selected lobby ID for confirmation
+      // Immediately send the POST request to confirm the booking when the modal is opened
+      const options = {
+        url: `http://localhost:4000/confirmBookingAdmin`, // Backend endpoint
+        method: "POST",
+        data: {
+          idLobby: this.selectedLobbyId, // Send the selected lobby ID for confirmation
+        },
+      };
+
+      // Make the Axios POST request to confirm the booking
+      this.$axios(options)
+        .then((res) => {
+          console.log("Booking confirmed:", res.data);
+          this.showConfirmationModal = false; // Close the confirmation modal if successful
+          // Optionally refresh the list or notify the user
+        })
+        .catch((error) => {
+          console.error("Error confirming booking: ", error);
+        });
+
+      // Optionally, show the modal, though in this case, the confirmation happens directly
+      this.showConfirmationModal = true;
     },
-  };
 
-  // Make the Axios POST request to confirm the booking
-  this.$axios(options)
-    .then((res) => {
-      console.log("Booking confirmed:", res.data);
-      this.showConfirmationModal = false; // Close the confirmation modal if successful
-      // Optionally refresh the list or notify the user
-    })
-    .catch((error) => {
-      console.error("Error confirming booking: ", error);
-    });
+    confirmCancelBooking() {
+      // Make a POST request to the backend with the reason for rejection
+      const options = {
+        url: `http://localhost:4000/rejectBookingAdmin`,
+        method: "POST",
+        data: {
+          Code: this.selectedLobbyId, // Send the selected lobby ID
+          Remark: this.cancelReason, // Send the cancellation reason
+        },
+      };
 
-  // Optionally, show the modal, though in this case, the confirmation happens directly
-  this.showConfirmationModal = true;
-},
-
-    closeConfirmationModal() {
-      this.showConfirmationModal = false; // Close the confirmation modal
+      // Make the Axios POST request to confirm the cancellation
+      this.$axios(options)
+        .then((res) => {
+          console.log("Booking rejected:", res.data);
+          this.showCancelModal = false; // Close the cancel modal if successful
+          // Optionally refresh the list or notify the user
+        })
+        .catch((error) => {
+          console.error("Error rejecting booking:", error);
+        });
     },
     logLobbyId(idLobby) {
-  console.log("Clicked idLobby:", idLobby);
-  this.selectedLobbyId = idLobby; // Store the clicked lobby ID
+      console.log("Clicked idLobby:", idLobby);
+      this.selectedLobbyId = idLobby; // Store the clicked lobby ID
 
-  // Set up the request options with query params
-  const options = {
-    url: `http://localhost:4000/getDetailBooking`,
-    method: "GET",
-    params: {
-      court_id: this.selectedLobbyId, // Pass the selectedLobbyId as court_id param
+      // Set up the request options with query params
+      const options = {
+        url: `http://localhost:4000/getDetailBooking`,
+        method: "GET",
+        params: {
+          court_id: this.selectedLobbyId, // Pass the selectedLobbyId as court_id param
+        },
+      };
+
+      // Make the Axios GET request
+      this.$axios(options)
+        .then((res) => {
+          // Store all data received from the API
+          this.joinList = res.data.data;
+          console.log(this.joinList);
+          console.log("API connected");
+
+          // Filter the joinList based on the selected lobby ID
+          this.filteredJoinList = this.joinList.filter(
+            (item) => item.idLobby === idLobby
+          );
+
+          // Show the log modal
+          this.showLogModal = true;
+        })
+        .catch((error) => {
+          console.error("API Error: ", error);
+        });
     },
-  };
-
-  // Make the Axios GET request
-  this.$axios(options).then((res) => {
-    // Store all data received from the API
-    this.joinList = res.data.data;
-    console.log(this.joinList);
-    console.log("API connected");
-
-    // Filter the joinList based on the selected lobby ID
-    this.filteredJoinList = this.joinList.filter(item => item.idLobby === idLobby);
-
-    // Show the log modal
-    this.showLogModal = true;
-  }).catch((error) => {
-    console.error("API Error: ", error);
-  });
-}
-,
     closeLogModal() {
       this.showLogModal = false; // Close the log modal
     },
