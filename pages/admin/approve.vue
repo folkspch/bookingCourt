@@ -47,39 +47,47 @@
     <!-- Log Lobby Modal -->
     <div class="modal" v-if="showLogModal">
       <div class="modal-background" @click="closeLogModal"></div>
-      <div class="modal-content">
+      <div class="modal-content large-modal">
         <span class="close" @click="closeLogModal">&times;</span>
-        <h2>LOBBY ID: {{ selectedLobbyId }}</h2> <!-- Dynamically display the selected Lobby ID -->
+        <h2>Lobby Details</h2>
+        <v-row>
+          <v-col cols="4">
+            <strong>Lobby ID:</strong>
+          </v-col>
+          <v-col cols="8">
+            {{ selectedLobbyId }}
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="4">
+            <strong>Court:</strong>
+          </v-col>
+          <v-col cols="8">
+            {{ filteredJoinList.length > 0 ? filteredJoinList[0].court : 'N/A' }}
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="4">
+            <strong>Time:</strong>
+          </v-col>
+          <v-col cols="8">
+            {{ filteredJoinList.length > 0 ? filteredJoinList[0].time : 'N/A' }}
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="4">
+            <strong>Member:</strong>
+          </v-col>
+          <v-col cols="8">
+            <ul>
+              <li v-for="(item, index) in filteredJoinList" :key="index">
+                {{ item.name }} - {{item.id}}
+              </li>
+            </ul>
+          </v-col>
+        </v-row>
         <div class="modal-actions">
           <v-btn x-small color="blue" class="confirm-button" @click="closeLogModal"> ปิด </v-btn>
-        </div>
-      </div>
-    </div>
-
-    <!-- First Modal (Cancellation) -->
-    <div class="modal" v-if="showCancelModal">
-      <div class="modal-background" @click="closeCancelModal"></div>
-      <div class="modal-content">
-        <span class="close" @click="closeCancelModal">&times;</span>
-        <h2>สาเหตุที่ต้องการยกเลิก</h2>
-        <p>Lobby ID: {{ selectedLobbyId }}</p> <!-- Show the selected lobby id -->
-        <textarea placeholder="สาเหตุที่ต้องการยกเลิก..." class="cancel-reason-input"></textarea>
-        <div class="modal-actions">
-          <v-btn x-small color="green" class="confirm-button" @click="closeCancelModal"> ยืนยัน </v-btn>
-        </div>
-      </div>
-    </div>
-
-    <!-- Second Modal (Confirmation or Other Action) -->
-    <div class="modal" v-if="showConfirmationModal">
-      <div class="modal-background" @click="closeConfirmationModal"></div>
-      <div class="modal-content">
-        <span class="close" @click="closeConfirmationModal">&times;</span>
-        <h2>ยืนยันการจอง</h2>
-        <p>คุณต้องการยืนยันการจองสำหรับ Lobby ID: {{ selectedLobbyId }}?</p>
-        <div class="modal-actions">
-          <v-btn x-small color="blue" class="confirm-button" @click="confirmBooking"> ยืนยัน </v-btn>
-          <v-btn x-small color="red" class="cancel-button" @click="closeConfirmationModal"> ยกเลิก </v-btn>
         </div>
       </div>
     </div>
@@ -94,6 +102,7 @@ export default {
       showCancelModal: false, // For cancellation modal
       showConfirmationModal: false, // For confirmation modal
       selectedLobbyId: null, // To store the selected lobby ID
+      filteredJoinList: [], // To store the filtered data from joinList
       court: [],
       lobbyList: [
         {
@@ -120,6 +129,36 @@ export default {
           time: "14:00 - 15:00",
           idLobby: "a004",
         },
+      ],
+      joinList: [
+        {
+          id: "1",
+          court : "02",
+          name: "ณพล ศรีสุวรรณ",
+          idLobby: "ASD123",
+          time : "09:00 - 10:00"
+        },
+        {
+          id: "2",
+          court : "02",
+          name: "เดช เดชาบูรพา",
+          idLobby: "ASD123",
+          time : "11:00 - 12:00"
+        },
+        {
+          id: "3",
+          court : "02",
+          name: "ศุภชัย พีระชัยรัตน์",
+          idLobby: "ASD123",
+          time : "15:00 - 16:00"
+        },
+        {
+          id: "4",
+          court : "02",
+          name: "เอก ยิ่งเจริญ",
+          idLobby: "ASD123",
+          time : "14:00 - 15:00"
+        }
       ],
       OpsTime: { OpenTime: null, CloseTime: null, ArrTime: [] },
     };
@@ -155,10 +194,35 @@ export default {
       this.showConfirmationModal = false; // Close the confirmation modal
     },
     logLobbyId(idLobby) {
-      console.log("Clicked idLobby:", idLobby);
-      this.selectedLobbyId = idLobby; // Store the clicked lobby ID
-      this.showLogModal = true; // Show the log modal
+  console.log("Clicked idLobby:", idLobby);
+  this.selectedLobbyId = idLobby; // Store the clicked lobby ID
+
+  // Set up the request options with query params
+  const options = {
+    url: `http://localhost:4000/getDetailBooking`,
+    method: "GET",
+    params: {
+      court_id: this.selectedLobbyId, // Pass the selectedLobbyId as court_id param
     },
+  };
+
+  // Make the Axios GET request
+  this.$axios(options).then((res) => {
+    // Store all data received from the API
+    this.joinList = res.data.data;
+    console.log(this.joinList);
+    console.log("API connected");
+
+    // Filter the joinList based on the selected lobby ID
+    this.filteredJoinList = this.joinList.filter(item => item.idLobby === idLobby);
+
+    // Show the log modal
+    this.showLogModal = true;
+  }).catch((error) => {
+    console.error("API Error: ", error);
+  });
+}
+,
     closeLogModal() {
       this.showLogModal = false; // Close the log modal
     },
@@ -236,11 +300,16 @@ export default {
 .modal-content {
   position: relative;
   background-color: #ffffff;
-  padding: 20px;
+  padding: 30px; /* Increased padding for larger modal */
   border-radius: 8px;
-  width: 400px;
+  width: 600px; /* Larger width */
   max-width: 90%;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.large-modal {
+  width: 800px; /* Set a wider width for larger modal */
+  max-width: 90%;
 }
 
 .close {
