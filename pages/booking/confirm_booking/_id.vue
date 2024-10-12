@@ -2,14 +2,27 @@
   <div>
     <v-row no-gutters class="d-flex">
       <v-col :cols="$vuetify.breakpoint.xsOnly ? 9 : 6">
-        <v-text-field height="51px" hint="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง เช่น s6101234567890"
-          v-on:keyup.enter="getInfoByID()" v-model="inputID" clearable solo
-          label="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง" color="black">
+        <v-text-field
+          height="51px"
+          hint="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง เช่น s6101234567890"
+          v-on:keyup.enter="getInfoByID()"
+          v-model="inputID"
+          clearable
+          solo
+          label="กรอกชื่อผู้ใช้ที่ต้องการเชิญเข้าร่วมการจอง"
+          color="black"
+        >
         </v-text-field>
       </v-col>
       <v-col cols="1">
-        <v-btn height="51px" @click="getInfoByID()" color="primary" :disabled="this.btnLoading"
-          :loading="this.btnLoading">ตกลง</v-btn>
+        <v-btn
+          height="51px"
+          @click="getInfoByID()"
+          color="primary"
+          :disabled="this.btnLoading"
+          :loading="this.btnLoading"
+          >ตกลง</v-btn
+        >
       </v-col>
     </v-row>
     <v-dialog v-model="confirmationDialog" persistent>
@@ -17,7 +30,9 @@
         <v-card-title>ยืนยันการเชิญ</v-card-title>
         <v-card-text>
           คุณต้องการเชิญ
-          <strong>{{ this.invitee.username }} {{ this.invitee.displayname }}</strong>
+          <strong
+            >{{ this.invitee.username }} {{ this.invitee.displayname }}</strong
+          >
           หรือไม่?
         </v-card-text>
         <v-card-actions>
@@ -31,12 +46,12 @@
     <v-dialog v-model="canceledDialog" persistent>
       <v-card>
         <v-card-title>ยกเลิกการจอง</v-card-title>
-        <v-card-text>
-          คุณได้ยกเลิกการจองนี้แล้ว
-        </v-card-text>
+        <v-card-text> คุณได้ยกเลิกการจองนี้แล้ว </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="$router.replace('booking')">ตกลง</v-btn>
+          <v-btn color="primary" @click="$router.replace('booking')"
+            >ตกลง</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -46,7 +61,9 @@
         <v-card-title>ยืนยันการเชิญ</v-card-title>
         <v-card-text>
           คุณต้องการเชิญ
-          <strong>{{ this.invitee.username }} {{ this.invitee.displayname }}</strong>
+          <strong
+            >{{ this.invitee.username }} {{ this.invitee.displayname }}</strong
+          >
           หรือไม่?
         </v-card-text>
         <v-card-actions>
@@ -68,7 +85,9 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="error" @click="dialogConfirmDel = false">ยกเลิก</v-btn>
-          <v-btn color="success" @click="deleteFromList(delUser.id)">ยืนยัน</v-btn>
+          <v-btn color="success" @click="deleteFromList(delUser.id)"
+            >ยืนยัน</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -103,8 +122,8 @@
         <v-card-title>ส่งลิงก์ยืนยันการเข้าร่วมแล้ว</v-card-title>
         <v-card-text>
           ส่งลิงก์ยืนยันการเข้าร่วมไปยังอีเมลล์ <br />{{
-        this.inputID + "@email.kmutnb.ac.th"
-      }}
+            this.inputID + "@email.kmutnb.ac.th"
+          }}
           แล้ว
         </v-card-text>
         <v-card-actions>
@@ -116,15 +135,18 @@
     <v-row>
       <v-col :cols="$vuetify.breakpoint.xsOnly ? 12 : 6">
         <v-card>
-          <v-system-bar window style="height: 100%;">
-            <v-card-title style="font-size: 1rem">รายชื่อผู้เข้าร่วมการจอง ({{ this.inviteList.length }}/{{
-        playerCondition.player
-      }})
+          <v-system-bar window style="height: 100%">
+            <v-card-title style="font-size: 1rem"
+              >รายชื่อผู้เข้าร่วมการจอง ({{ this.inviteList.length }}/{{
+                playerCondition.player
+              }})
             </v-card-title>
             <v-spacer></v-spacer>
             <div>
               รหัสเข้าร่วม: {{ this.code }}
-              <v-icon @click="copyToClipboard()" small color="orange lighten-1">mdi-content-copy</v-icon>
+              <v-icon @click="copyToClipboard()" small color="orange lighten-1"
+                >mdi-content-copy</v-icon
+              >
             </div>
             <v-divider light vertical inset class="mr-2"></v-divider>
             <v-btn @click="getLobbyList()" x-small>
@@ -132,20 +154,40 @@
               รีเฟรชรายชื่อ
             </v-btn>
           </v-system-bar>
-          <v-card v-if="this.inviteList.length != 0" max-height="500px" class="overflow-auto" elevation="0">
+          <v-card
+            v-if="this.inviteList.length != 0"
+            max-height="500px"
+            class="overflow-auto"
+            elevation="0"
+          >
             <v-simple-table>
               <tbody>
                 <tr v-for="item in this.inviteList" :key="item.id">
                   <td>{{ item.id }}</td>
                   <td>{{ item.name }}</td>
                   <td>
-                    <v-icon v-if="item.status == 'Confirmed'" color="green" dense small>
-                      mdi-checkbox-marked-circle</v-icon><v-icon v-else-if="item.status == 'Pending'" color="primary"
-                      dense small>
-                      mdi-timer-sand</v-icon>{{ item.status }}
+                    <v-icon
+                      v-if="item.status == 'Confirmed'"
+                      color="green"
+                      dense
+                      small
+                    >
+                      mdi-checkbox-marked-circle</v-icon
+                    ><v-icon
+                      v-else-if="item.status == 'Pending'"
+                      color="primary"
+                      dense
+                      small
+                    >
+                      mdi-timer-sand</v-icon
+                    >{{ item.status }}
                   </td>
                   <td>
-                    <v-btn v-if="checkDelBtn(item.id)" icon @click="showDialogCfDel(item.id, item.name)">
+                    <v-btn
+                      v-if="checkDelBtn(item.id)"
+                      icon
+                      @click="showDialogCfDel(item.id, item.name)"
+                    >
                       <v-icon color="red lighten-1">mdi-minus-circle</v-icon>
                     </v-btn>
                   </td>
@@ -174,26 +216,47 @@
               </v-btn>
             </v-list-item-action>
           </v-list-item> -->
-
           </v-card>
-          <v-card flat
-            v-if="isHost" class="py-5"
-            color='white'>
+          <v-card flat v-if="isHost" class="py-5" color="white">
             <v-row class="d-flex justify-center">
-              <v-btn @click="dialogCancel = true" class="mx-2" dark large color="red" width="auto">ยกเลิกการจอง</v-btn>
-              <v-btn @click="sendRequest()" large color="primary" width="auto">ส่งคำขอการจองสนาม</v-btn>
+              <v-btn
+                @click="dialogCancel = true"
+                class="mx-2"
+                dark
+                large
+                color="red"
+                width="auto"
+                >ยกเลิกการจอง</v-btn
+              >
+              <v-btn @click="sendRequest()" large color="primary" width="auto"
+                >ส่งคำขอการจองสนาม</v-btn
+              >
             </v-row>
           </v-card>
           <v-card v-if="this.inviteList.length == 0" height="500px">
-            <v-card-text class="d-flex justify-center align-center">ไม่มีข้อมูล</v-card-text>
+            <v-card-text class="d-flex justify-center align-center"
+              >ไม่มีข้อมูล</v-card-text
+            >
           </v-card>
         </v-card>
+
+        <CourtDetail
+          :Court="this.court"
+          :selectedCourt="this.court"
+          page="confirm_booking"
+          :selectedTime="this.selectedTime"
+        ></CourtDetail>
       </v-col>
-      <v-col :cols="$vuetify.breakpoint.xsOnly ? 12 : 6">
-        <CourtDetail class="d-flex justify-center" :Court="this.court" :selectedCourt="this.court"
-          :page="'confirm_booking'" :selectedTime="this.selectedTime"></CourtDetail>
+      <v-col v-if="annouceData" :cols="$vuetify.breakpoint.xsOnly ? 12 : 6">
+        <v-card>
+          <v-card-text class="pa-1" style="background-color: #e0e0e0">
+            <div class="ml-1">ประกาศ</div>
+          </v-card-text>
+          <div class="html-area pa-2" v-html="annouceData"></div>
+        </v-card>
       </v-col>
     </v-row>
+
     <!-- <v-row class="d-flex justify-end">
       <v-btn class="mx-2" dark large color="red" width="auto"
         >ยกเลิกการจอง</v-btn
@@ -202,7 +265,6 @@
         >ส่งคำขอการจองสนาม</v-btn
       >
     </v-row> -->
-
   </div>
 </template>
 
@@ -210,11 +272,9 @@
 import CourtDetail from "@/components/CourtDetail.vue";
 export default {
   middleware: "checkBookingValue",
-  async asyncData({ params }) {
-    const code = params.code;
-    const court = params.court;
-
-    console.log(court, code);
+  async asyncData({ params, query }) {
+    const code = query.code;
+    const court = params.id;
     return { code, court };
   },
   components: {
@@ -251,6 +311,7 @@ export default {
       canceledDialog: false,
       selectedTime: null,
       isHost: false,
+      annouceData: null,
     };
   },
   methods: {
@@ -280,11 +341,11 @@ export default {
       // const user = this.inviteList.find((e) => e.id === x);
       // const myId = this.inviteList.find((e) => e.id === this.user.username);
       if (!this.isHost) {
-        return false
+        return false;
       } else if (x === this.$auth.user.user_id) {
-        return false
+        return false;
       } else {
-        return true
+        return true;
       }
       // if (myId.status == "Host") {
       //   if (myId.id == g.id) {
@@ -301,7 +362,6 @@ export default {
       //     return false;
       //   }
       // }
-
 
       // const myId = this.inviteList.find((e) => e.id === this.user.username);
       // if (
@@ -428,7 +488,7 @@ export default {
         time_start: this.$store.state.selectedTime.time_start,
         time_end: this.$store.state.selectedTime.time_end,
       };
-      console.log('body', body);
+      console.log("body", body);
       if (
         (body.court != "") &
         (body.time_start != null) &
@@ -455,11 +515,14 @@ export default {
           .post("http://localhost:4000/getLobbyData", body)
           .then((res) => {
             console.log(res, "resss");
-            this.selectedTime = `${res.data[0].Time_start} - ${res.data[0].Time_end}`
+            this.selectedTime = `${res.data[0].Time_start} - ${res.data[0].Time_end}`;
             this.inviteList = [];
             for (let i = 0; i < res.data.length; i++) {
-              if (res.data[i].Invite_status === 'Host' && res.data[i].User_id === this.$auth.user.user_id) {
-                this.isHost = true
+              if (
+                res.data[i].Invite_status === "Host" &&
+                res.data[i].User_id === this.$auth.user.user_id
+              ) {
+                this.isHost = true;
               }
               this.playerCondition.player = res.data[0].Players;
               this.playerCondition.player_strict = res.data[0].Players_strict;
@@ -494,7 +557,7 @@ export default {
       }
     },
     cancelBook(btn) {
-      this.dialogCancel = false
+      this.dialogCancel = false;
       if ((this.$store.state.selectedCourt || this.court) && this.code) {
         this.$axios
           .delete("http://localhost:4000/cancelBook", {
@@ -507,13 +570,23 @@ export default {
           })
           .then((res) => {
             if (res.status === 200) {
-              this.canceledDialog = true
+              this.canceledDialog = true;
             }
           });
       }
       this.confirmExit = true;
     },
-
+    getAnnounce() {
+      this.$axios
+        .get(`http://localhost:4000/getAnnouncementByCourt/${this.court}`)
+        .then((res) => {
+          if (res.status === 200) {
+            // console.log(res.data[0].Content)
+            this.annouceData = res.data[0].Content;
+            // console.log(res.data[0])
+          }
+        });
+    },
     // beforeWindowUnload(e) {
     //   console.log("exitt");
     //   const answer = window.confirm(
@@ -526,7 +599,6 @@ export default {
     //     e.returnValue = "";
     //   }
     // },
-
   },
   beforeRouteLeave(to, from, next) {
     this.$store.commit("clearState");
@@ -542,7 +614,7 @@ export default {
     } else {
       this.getLobbyList();
     }
-    // this.pollData();
+    this.getAnnounce();
   },
   beforeDestroy() {
     this.$store.commit("clearState");
@@ -552,6 +624,11 @@ export default {
 </script>
 
 <style scoped>
+.html-area {
+  /* width: 300px;    
+  height: 200px;    */
+  overflow: auto;
+}
 .sticky-footer {
   position: fixed;
   width: 100%;

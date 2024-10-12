@@ -23,16 +23,18 @@
       <v-list>
         <!-- <div class="d-flex justify-center mb-3"></div> -->
         <v-list-item>
-        <v-list-item-action>
-          <v-icon color="orange lighten-4">mdi-account</v-icon>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>{{ $auth.user.user_id }}</v-list-item-title>
-          <v-list-item-title>{{ $auth.user.name }}</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+          <v-list-item-action>
+            <v-icon color="orange lighten-4">mdi-account</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>{{ $auth.user.user_id }}</v-list-item-title>
+            <v-list-item-title>{{ $auth.user.name }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item
-          v-for="(item, i) in items"
+          v-for="(item, i) in $auth.user.account_type.toLowerCase() == 'admin'
+            ? adminPage
+            : userPage"
           :key="i"
           :to="item.to"
           router
@@ -50,7 +52,9 @@
     <v-app-bar :clipped-left="clipped" fixed app :color="themeColor">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-spacer />
-      <a style="color: white; margin-right: 0" @click="$router.push('/my_book')">การจองของฉัน</a>
+      <a style="color: white; margin-right: 0" @click="$router.push('/my_book')"
+        >การจองของฉัน</a
+      >
       <v-divider light vertical inset class="mx-2"></v-divider>
       <a @click="logout()" style="color: white; margin-right: 0">ออกจากระบบ</a>
     </v-app-bar>
@@ -80,15 +84,15 @@ export default {
   data() {
     return {
       // themeColor:"#92B9E7",
-      userInfo:{
-        username:"",
-        displayname:""
+      userInfo: {
+        username: "",
+        displayname: "",
       },
       themeColor: "#FF8B10",
       clipped: false,
       drawer: true,
       fixed: false,
-      items: [
+      userPage: [
         {
           icon: "mdi-apps",
           title: "หน้าแรก",
@@ -119,6 +123,8 @@ export default {
           title: "ติดต่อ",
           to: "/contact",
         },
+      ],
+      adminPage: [
         {
           icon: "mdi-contacts",
           title: "index",
@@ -169,7 +175,7 @@ export default {
   methods: {
     logout() {
       this.$auth.logout();
-      this.$router.replace('/login');
+      this.$router.replace("/login");
     },
   },
   created() {
@@ -182,5 +188,4 @@ export default {
 * {
   font-family: "Prompt", sans-serif;
 }
-
 </style>

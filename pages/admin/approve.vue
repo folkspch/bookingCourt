@@ -89,6 +89,7 @@
 
 <script>
 export default {
+  middleware: "isAdmin",
   async asyncData({ $axios }) {
     return await $axios
       .get("http://localhost:4000/getCourtData")

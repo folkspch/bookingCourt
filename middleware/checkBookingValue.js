@@ -1,5 +1,5 @@
-export default function ({ params, redirect }) {
-    if(!params.code){
-      redirect('/booking');
-    }
+export default function ({ params, query, redirect }) {
+  if (!params.court && !query.code) {
+    redirect("/booking");
   }
+}

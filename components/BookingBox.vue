@@ -15,25 +15,28 @@
             ></v-img>
           </div>
         </v-col>
-        <v-col :cols="$vuetify.breakpoint.xsOnly?8:6">
+        <v-col :cols="$vuetify.breakpoint.xsOnly ? 8 : 6">
           <div>
             <div
               style="align-items: center; width: 100%"
               :class="$vuetify.breakpoint.xsOnly ? 'd-block' : 'd-flex'"
             >
               <v-card-title>{{ bookingList.Name_th }}</v-card-title>
-              <div :class="$vuetify.breakpoint.xsOnly ? 'ml-3 mb-2' : ''" >
-                <v-chip dark color="amber" v-if="bookingList.Status == 'pending'"
+              <div :class="$vuetify.breakpoint.xsOnly ? 'ml-3 mb-2' : ''">
+                <v-chip
+                  dark
+                  color="amber"
+                  v-if="bookingList.Status == 'pending'"
                   >กำลังดำเนินการ</v-chip
                 >
                 <v-chip
-                dark
+                  dark
                   color="green"
                   v-else-if="bookingList.Status == 'success'"
                   >สำเร็จแล้ว</v-chip
                 >
                 <v-chip
-                dark
+                  dark
                   color="red"
                   v-else-if="bookingList.Status == 'reject'"
                   >ถูกยกเลิก</v-chip
@@ -70,8 +73,8 @@
     </v-card>
   </div>
 </template>
-  
-  <script>
+
+<script>
 export default {
   data() {
     return {};
@@ -94,11 +97,7 @@ export default {
     },
     gotoBookingInfo() {
       this.$router.push({
-        name: "confirm_booking",
-        params: {
-          code: this.bookingList.Code,
-          court: this.bookingList.Court,
-        },
+        path: `/booking/confirm_booking/${this.bookingList.Court}?code=${this.bookingList.Code}`
       });
     },
   },
@@ -106,6 +105,5 @@ export default {
   created() {},
 };
 </script>
-  
-  <style></style>
-  
+
+<style></style>

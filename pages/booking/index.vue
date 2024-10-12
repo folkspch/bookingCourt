@@ -218,13 +218,13 @@ export default {
       timeChoice: [],
       invite_code: null,
       dialog: false,
-      loading:false
+      loading: false,
     };
   },
 
   methods: {
     createLobby() {
-      this.loading = true
+      this.loading = true;
       let body = {
         court: this.selectedCourt,
         time_start: this.selectedTime[0],
@@ -238,17 +238,14 @@ export default {
         this.$axios
           .post("http://localhost:4000/createList", body)
           .then((res) => {
-            this.loading = false
+            this.loading = false;
             this.$router.push({
-                name: "confirm_booking",
-                params: {
-                  code: res.data.code,
-                  court: res.data.court,
-                },
-              });
+              path: `/booking/confirm_booking/${res.data.court}?code=${res.data.code}`,
+              
+            });
           });
       } else {
-        this.loading = false
+        this.loading = false;
         console.error("error occurred");
       }
     },
@@ -362,11 +359,7 @@ export default {
             console.log("res", res);
             if (res.data.length != 0) {
               this.$router.push({
-                name: "confirm_booking",
-                params: {
-                  code: res.data.code,
-                  court: res.data.court,
-                },
+                path: `/booking/confirm_booking/${res.data.court}?code=${res.data.code}`
               });
             } else {
               this.dialog = true;
