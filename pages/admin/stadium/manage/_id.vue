@@ -380,15 +380,15 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="error" @click="editTimeDialog = false">ยกเลิก</v-btn>
-          <v-btn color="success" @click="uodateOperationTimeValue"
+          <v-btn color="success" @click="updateOperationTimeValue"
             >ยืนยัน</v-btn
           >
         </v-card-actions>
       </v-card>
     </v-dialog>
-    {{ tmpDailyData }}
+    <!-- {{ tmpDailyData }}
     <div></div>
-    {{ courtData.Operation_time }}
+    {{ courtData.Operation_time }} -->
   </div>
 </template>
 
@@ -541,7 +541,7 @@ export default {
           this.courtData = { ...res.data };
         });
     },
-    uodateOperationTimeValue() {
+    updateOperationTimeValue() {
       this.courtData.Operation_time = _.cloneDeep(this.tmpDailyData);
       this.editTimeDialog = false;
     },
