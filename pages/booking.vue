@@ -218,13 +218,13 @@ export default {
       timeChoice: [],
       invite_code: null,
       dialog: false,
-      loading:false
+      loading: false,
     };
   },
 
   methods: {
     createLobby() {
-      this.loading = true
+      this.loading = true;
       let body = {
         court: this.selectedCourt,
         time_start: this.selectedTime[0],
@@ -238,29 +238,20 @@ export default {
         this.$axios
           .post("http://localhost:4000/createList", body)
           .then((res) => {
-            this.loading = false
+            this.loading = false;
             this.$router.push({
-                name: "confirm_booking",
-                params: {
-                  code: res.data.code,
-                  court: res.data.court,
-                },
-              });
+              name: "confirm_booking",
+              params: {
+                code: res.data.code,
+                court: res.data.court,
+              },
+            });
           });
       } else {
-        this.loading = false
+        this.loading = false;
         console.error("error occurred");
       }
-    },
-    // setSelectedCourt() {
-    //   let data = this.court.find((e) => e.Court_id === this.selectedCourt);
-    //   data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
-    //   this.$store.commit("setSelectedTime", this.selectedTime);
-    //   this.$store.commit("setSelectedCourt", this.selectedCourt);
-    //   this.$store.commit("setCourtDetail", data);
-    //   console.log(this.$store.state.courtDetail);
-    //   this.$router.replace("/confirm_booking");
-    // },
+    }, 
     isInRange(value, range) {
       if (this.plotStatus == 1) {
         return true;
@@ -270,51 +261,98 @@ export default {
     },
     plotTable() {
       let d = new Date();
-      let today =
-        d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-      today = "2022-07-29";
+      let today = `${d.getFullYear()}-${(d.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
+
+      console.log("Today's Date:", today);
+
       const options = {
         url: `http://localhost:4000/getBookingData/${today}/${this.selectedCourt}`,
         method: "GET",
       };
-      var courtDetail = this.court[parseInt(this.selectedCourt) - 1];
-      var OpsHour =
+
+      // Get court details
+      const courtDetail = this.court.find(
+        (e) => e.Court_id === this.selectedCourt
+      );
+      const OpsHour =
         parseInt(courtDetail.TimeClose.substring(0, 2)) -
         parseInt(courtDetail.TimeOpen.substring(0, 2));
-      if (this.countSlot < OpsHour) {
-        this.countSlot = OpsHour;
-      }
+
+      // Adjust the slot count if needed
+      this.countSlot = Math.max(this.countSlot, OpsHour);
+
+      // Fetch booking data
       this.$axios(options).then((res) => {
         this.table = res.data.data;
-        console.log(this.countSlot, "cntslot");
-        console.log(this.table, "table");
+        console.log("Total Slots:", this.countSlot);
+        console.log("Booking Data:", this.table);
+
+        // Reset all slot statuses
         for (let i = 0; i < this.countSlot; i++) {
-          let temp = i + 1;
-          let table = temp.toString();
-          let temp1 = document.getElementById("table" + table);
-          temp1.classList.remove("reserved");
-          temp1.classList.remove("inProgress");
-          temp1.classList.remove("free");
+          const slot = document.getElementById(`table${i + 1}`);
+          slot.classList.remove("reserved", "pending", "free");
         }
+
+        // Update slot statuses based on booking data
         for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
-          var found = this.table.find(
-            (e) => e.Time_Start === this.OpsTime.ArrTime[i].Time[0]
-          );
-          let temp = document.getElementById("table" + (i + 1));
-          if (found) {
-            // console.log("Status", found.Status, "Time", found.Time_Start);
-            if (found.Status == "0") {
-              temp.classList.add("reserved");
-            } else if (found.Status == "1") {
-              temp.classList.add("inProgress");
+          const timeSlot = this.OpsTime.ArrTime[i].Time[0];
+          console.log("this.table[i].Time_Start", this.table[i]?.Time_Start);
+          console.log("this.table[i].timeSlot", timeSlot);
+          const slotElement = document.getElementById(`table${i + 1}`);
+          if (this.table[i]?.Time_Start === timeSlot) {
+            console.log("asdsad", this.table[i]);
+            if (this.table[i]?.Status === "reserved") {
+              slotElement.classList.add("reserved");
+            } else if (this.table[i]?.Status === "pending") {
+              slotElement.classList.add("pending");
             }
           } else {
-            temp.classList.add("free");
+            slotElement.classList.add("free");
           }
         }
-        this.countSlot = OpsHour;
+
         this.filterTime();
       });
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+      let currentDay = daysOfWeek[d.getDay()];
+const options2 = {
+        url: `http://localhost:4000/admin/getBookingDataAdmin/${currentDay}/${this.selectedCourt}`,
+        method: "GET",
+      };
+      this.$axios(options2).then((res) => {
+        this.table = res.data.data;
+        console.log("res.data :", res.data.data);
+        console.log("Total Slots:", this.countSlot);
+        console.log("Booking Data:", this.table);
+
+        // Reset all slot statuses
+        for (let i = 0; i < this.countSlot; i++) {
+          const slot = document.getElementById(`table${i + 1}`);
+          slot.classList.remove("reserved", "pending", "free");
+        }
+
+        // Update slot statuses based on booking data
+        for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
+          const timeSlot = this.OpsTime.ArrTime[i].Time[0];
+          console.log("this.table[i].Time_Start2", this.table[i]);
+          console.log("this.table[i].Time_Start2aas", this.table[i]?.time_start);
+          console.log("this.table[i].timeSlot2", timeSlot);
+          const slotElement = document.getElementById(`table${i + 1}`);
+          if (this.table[i]?.time_start === timeSlot) {
+            console.log("asfdrkgjfn");
+            
+              slotElement.classList.add("reserved");
+          } else {
+            slotElement.classList.add("free");
+          }
+        }
+
+        this.filterTime();
+      });
+
       this.setOpTime();
     },
     setOpTime() {
@@ -329,8 +367,8 @@ export default {
       );
       console.log("ggin", this.OpsTime.OpenTime, this.OpsTime.CloseTime);
       for (let i = this.OpsTime.OpenTime; i < this.OpsTime.CloseTime; i++) {
-        var temp1 = i + ".00";
-        var temp2 = i + 1 + ".00";
+        var temp1 = i + ":00";
+        var temp2 = i + 1 + ":00";
         this.OpsTime.ArrTime.push({
           Time: [temp1, temp2],
           TimeForShow: temp1 + " - " + temp2,
@@ -392,7 +430,7 @@ export default {
   border-width: 5px;
   border-color: #ebecf0;
 }
-.inProgress {
+.pending {
   background-color: #2196f3;
   border-style: solid;
   border-width: 5px;

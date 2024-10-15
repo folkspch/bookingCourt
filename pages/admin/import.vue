@@ -155,7 +155,7 @@ export default {
 
     try {
       const response = await this.$axios.post(
-        "http://localhost:4000/import-booking-admin",
+        "http://localhost:4000/admin/import-booking-admin",
         payload
       );
       console.log("Import successful:", response.data);

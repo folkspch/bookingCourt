@@ -257,7 +257,7 @@ export default {
     
       // Send a GET request to the backend with the query parameters
       this.$axios
-        .get("http://localhost:4000/getCourtDataBooking", { params })
+        .get("http://localhost:4000/admin/getCourtDataBooking", { params })
         .then((response) => {
           // Update the items with the received data
           this.items = response.data.data;

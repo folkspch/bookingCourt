@@ -224,7 +224,7 @@ export default {
   methods: {
     API() {
       const options = {
-        url: `http://localhost:4000/getBookingForApprove`,
+        url: `http://localhost:4000/admin/getBookingForApprove`,
         method: "GET",
       };
       this.$axios(options).then((res) => {
@@ -247,7 +247,7 @@ export default {
 
       // Immediately send the POST request to confirm the booking when the modal is opened
       const options = {
-        url: `http://localhost:4000/confirmBookingAdmin`, // Backend endpoint
+        url: `http://localhost:4000/admin/confirmBookingAdmin`, // Backend endpoint
         method: "POST",
         data: {
           idLobby: this.selectedLobbyId, // Send the selected lobby ID for confirmation
@@ -272,7 +272,7 @@ export default {
     confirmCancelBooking() {
       // Make a POST request to the backend with the reason for rejection
       const options = {
-        url: `http://localhost:4000/rejectBookingAdmin`,
+        url: `http://localhost:4000/admin/rejectBookingAdmin`,
         method: "POST",
         data: {
           Code: this.selectedLobbyId, // Send the selected lobby ID
@@ -297,7 +297,7 @@ export default {
 
       // Set up the request options with query params
       const options = {
-        url: `http://localhost:4000/getDetailBooking`,
+        url: `http://localhost:4000/admin/getDetailBooking`,
         method: "GET",
         params: {
           court_id: this.selectedLobbyId, // Pass the selectedLobbyId as court_id param

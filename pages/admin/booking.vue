@@ -14,6 +14,29 @@
           solo
         ></v-select>
       </v-col>
+      <div class="px-5">หรือ</div>
+      <v-col cols="12" lg="6">
+        <v-row no-gutters class="d-flex">
+          <v-col cols="9" lg="">
+            <v-text-field
+              hide-details
+              v-model="invite_code"
+              solo
+              placeholder="กรอกรหัสเข้าร่วมการจอง"
+              label="กรอกรหัสเข้าร่วมการจอง"
+            >
+              <v-icon slot="append" @click="paste()">
+                mdi-content-paste
+              </v-icon>
+            </v-text-field>
+          </v-col>
+          <v-col>
+            <v-btn @click="joinByCode()" color="primary" height="48px"
+              >เข้าร่วม</v-btn
+            >
+          </v-col>
+        </v-row>
+      </v-col>
     </v-row>
     <v-simple-table v-if="this.selectedCourt" class="mb-5">
       <template v-slot:default>
@@ -61,33 +84,24 @@
     </v-simple-table>
     <div v-if="selectedCourt != null">
       <v-divider class="pb-5"></v-divider>
-      <v-col cols="12">
+      <v-col cols="12" lg="3">
         <v-row>
           <v-select
             item-color="orange"
             v-model="selectedTime"
             :items="timeChoice"
-            item-text="TimeBefore"
+            item-text="TimeForShow"
             item-value="Time"
             solo
             label="กรุณาเลือกช่วงเวลาที่ต้องการจอง"
           >
           </v-select>
-          <v-select
-            item-color="orange"
-            v-model="selectedTimeB"
-            :items="timeChoice"
-            item-text="TimeAfter"
-            item-value="Time"
-            solo
-            label="กรุณาเลือกช่วงเวลาที่ต้องการจอง"
-          >
-          </v-select>
+          <!-- {{ this.selectedTime }} -->
         </v-row>
       </v-col>
     </div>
     <v-divider class="pb-5"></v-divider>
-    <div v-if="selectedTime != null && selectedTimeB != null">
+    <div v-if="selectedTime != null">
       <v-row>
         <v-col cols="12" lg="6">
           <v-card>
@@ -114,7 +128,7 @@
                   </p>
                   <p>
                     ช่วงเวลาที่ต้องการจอง :
-                    {{ this.selectedTime[0] + " - " + this.selectedTimeB[1] }}
+                    {{ this.selectedTime[0] + " - " + this.selectedTime[1] }}
                   </p>
                 </v-card-text>
               </v-col>
@@ -130,12 +144,13 @@
         </v-col>
         <v-col cols="12" lg="6">
           <div
-            v-if="this.selectedCourt && this.selectedTime && this.selectedTimeB"
+            v-if="this.selectedCourt && this.selectedTime"
             class="d-flex justify-end"
           >
             <v-btn
               :absolute="!$vuetify.breakpoint.xsOnly"
-              @click="setSelectedCourt()"
+              :loading="this.loading"
+              @click="createLobby()"
               large
               bottom
               right
@@ -193,18 +208,9 @@ export default {
           Type_th: "",
         },
       ],
-      timeList: [
-        // เข้าหน้าจอนี้แล้วให้ยิง api ไป query database find หา status ที่ยังไม่ได้ approve การจองทุกครั้ง เพื่อให้รู้ได้ว่ามี lobby เข้ามาใหม่หรือไม่
-        // ตอนจองให้ส่งเมล์ไปที่ admin เพื่อเป็น notification ให้กับผู้ดูแล
-        { time: "1" },
-        { time: "2" },
-        { time: "3" },
-      ],
       listCourt: [],
       selectedCourt: null,
-      selectedTimeRange: null,
       selectedTime: null,
-      selectedTimeB: null,
       OpsTime: { OpenTime: null, CloseTime: null, ArrTime: [] },
       table: [],
       plotStatus: 0,
@@ -212,26 +218,49 @@ export default {
       timeChoice: [],
       invite_code: null,
       dialog: false,
+      loading:false
     };
   },
 
   methods: {
-    setSelectedCourt() {
-      const timeBefore = parseFloat(this.selectedTime[0]);
-      const timeAfter = parseFloat(this.selectedTimeB[1]);
-      if (timeAfter >= timeBefore) {
-        let data = this.court.find((e) => e.Court_id === this.selectedCourt);
-        data.time = this.selectedTime[0] + "-" + this.selectedTimeB[1];
-        this.$store.commit("setSelectedTime", this.selectedTime);
-        this.$store.commit("setSelectedTimeB", this.selectedTimeB);
-        this.$store.commit("setSelectedCourt", this.selectedCourt);
-        this.$store.commit("setCourtDetail", data);
-        console.log(this.$store.state.courtDetail);
-        this.$router.replace("/confirm_booking");
+    createLobby() {
+      this.loading = true
+      let body = {
+        court: this.selectedCourt,
+        time_start: this.selectedTime[0],
+        time_end: this.selectedTime[1],
+      };
+      if (
+        (body.court != "") &
+        (body.time_start != null) &
+        (body.time_end != null)
+      ) {
+        this.$axios
+          .post("http://localhost:4000/createList", body)
+          .then((res) => {
+            this.loading = false
+            this.$router.push({
+                name: "confirm_booking",
+                params: {
+                  code: res.data.code,
+                  court: res.data.court,
+                },
+              });
+          });
       } else {
-        alert("Error: TimeAfter cannot be less than or equal to TimeBefore");
+        this.loading = false
+        console.error("error occurred");
       }
     },
+    // setSelectedCourt() {
+    //   let data = this.court.find((e) => e.Court_id === this.selectedCourt);
+    //   data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
+    //   this.$store.commit("setSelectedTime", this.selectedTime);
+    //   this.$store.commit("setSelectedCourt", this.selectedCourt);
+    //   this.$store.commit("setCourtDetail", data);
+    //   console.log(this.$store.state.courtDetail);
+    //   this.$router.replace("/confirm_booking");
+    // },
     isInRange(value, range) {
       if (this.plotStatus == 1) {
         return true;
@@ -240,76 +269,70 @@ export default {
       }
     },
     plotTable() {
-      let d = new Date();
-      let today =
-        d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-      today = "2024-03-23";
-      const options = {
-        url: `http://localhost:4000/getBookingData/${today}/${this.selectedCourt}`,
-        method: "GET",
-      };
-      var courtDetail = this.court[parseInt(this.selectedCourt) - 1];
-      var OpsHour =
-        parseInt(courtDetail.TimeClose.substring(0, 2)) -
-        parseInt(courtDetail.TimeOpen.substring(0, 2));
-      if (this.countSlot < OpsHour) {
-        this.countSlot = OpsHour;
+  let d = new Date();
+  let today = `${d.getFullYear()}-${(d.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
+
+  console.log("Today's Date:", today);
+
+  const options = {
+    url: `http://localhost:4000/getBookingData/${today}/${this.selectedCourt}`,
+    method: "GET",
+  };
+
+  // Get court details
+  const courtDetail = this.court.find(
+    (e) => e.Court_id === this.selectedCourt
+  );
+  const OpsHour =
+    parseInt(courtDetail.TimeClose.substring(0, 2)) -
+    parseInt(courtDetail.TimeOpen.substring(0, 2));
+
+  // Adjust the slot count if needed
+  this.countSlot = Math.max(this.countSlot, OpsHour);
+
+  // Fetch booking data
+  this.$axios(options).then((res) => {
+    this.table = res.data.data;
+    console.log("Total Slots:", this.countSlot);
+    console.log("Booking Data:", this.table);
+
+    // Reset all slot statuses
+    for (let i = 0; i < this.countSlot; i++) {
+      const slot = document.getElementById(`table${i + 1}`);
+      slot.classList.remove("reserved", "pending", "free");
+    }
+
+    // Update slot statuses based on booking data
+    for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
+      const timeSlot = this.OpsTime.ArrTime[i].Time[0];
+      console.log('this.table[i].Time_Start' , this.table[i]?.Time_Start);
+      console.log('this.table[i].timeSlot' , timeSlot);
+        const slotElement = document.getElementById(`table${i + 1}`);
+      if(this.table[i]?.Time_Start === (timeSlot)){
+        console.log('asdsad' ,this.table[i]);
+        if (this.table[i]?.Status === "reserved") {
+          slotElement.classList.add("reserved");
+        } else if (this.table[i]?.Status === "pending") {
+          slotElement.classList.add("pending");
+        }
+      }else{
+        slotElement.classList.add("free");
+
       }
-      this.$axios(options).then((res) => {
-        this.table = res.data.data;
-        console.log(this.countSlot, "cntslot");
-        console.log(this.table, "table");
-        for (let i = 0; i < this.countSlot; i++) {
-          let temp = i + 1;
-          let table = temp.toString();
-          let temp1 = document.getElementById("table" + table);
-          temp1.classList.remove("reserved");
-          temp1.classList.remove("inProgress");
-          temp1.classList.remove("free");
-          
-        }
-       
-        for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
-          var found = this.table.find(
-            (e) => e.Time_Start === this.OpsTime.ArrTime[i].Time[0]
-          );
-          let temp = document.getElementById("table" + (i + 1));
-          if (this.table[0]?.is_available == 0) {
-            console.log("asdasd");
-            temp.classList.add("inProgress");
-          }
-          if (found) {
-            // console.log("Status", found.Status, "Time", found.Time_Start);
-            if (found.Status == "0") {
-              temp.classList.add("reserved");
-            } else if (found.Status == "1") {
-              temp.classList.add("inProgress");
-            }
-          } else {
-            temp.classList.add("free");
-          }
-          
-        }
-        this.countSlot = OpsHour;
-         for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
-          
-          let temp = document.getElementById("table" + (i + 1));
-          if (this.table[0]?.is_available == 0) {
-            console.log("asdasd");
-            temp.classList.add("inProgress");
-          }
-          
-          
-        }
-        this.filterTime();
-      });
-      this.setOpTime();
-    },
+      
+    }
+
+    this.filterTime();
+  });
+
+  this.setOpTime();
+},
     setOpTime() {
       console.log("SET");
       this.OpsTime.ArrTime = [];
       this.selectedTime = null;
-      this.selectedTimeB = null;
       this.OpsTime.OpenTime = parseInt(
         this.court[parseInt(this.selectedCourt) - 1].TimeOpen.substring(0, 2)
       );
@@ -317,19 +340,14 @@ export default {
         this.court[parseInt(this.selectedCourt) - 1].TimeClose.substring(0, 2)
       );
       console.log("ggin", this.OpsTime.OpenTime, this.OpsTime.CloseTime);
-      console.log("ggin", this.selectedTimeRange);
-
-      for (let i = this.OpsTime.OpenTime; i < this.OpsTime.CloseTime; i += 1) {
-        var temp1 = i + ".00";
-        var temp2 = i + 1 + ".00";
+      for (let i = this.OpsTime.OpenTime; i < this.OpsTime.CloseTime; i++) {
+        var temp1 = i + ":00";
+        var temp2 = i + 1 + ":00";
         this.OpsTime.ArrTime.push({
           Time: [temp1, temp2],
-          TimeForShow: temp1 + " a - " + temp2,
-          TimeBefore: temp1,
-          TimeAfter: temp2,
+          TimeForShow: temp1 + " - " + temp2,
         });
       }
-
       console.log(this.OpsTime.ArrTime, "ArrTime");
     },
     filterTime() {
@@ -386,7 +404,7 @@ export default {
   border-width: 5px;
   border-color: #ebecf0;
 }
-.inProgress {
+.pending {
   background-color: #2196f3;
   border-style: solid;
   border-width: 5px;
