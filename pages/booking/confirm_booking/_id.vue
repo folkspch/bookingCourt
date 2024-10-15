@@ -228,7 +228,8 @@
                 width="auto"
                 >ยกเลิกการจอง</v-btn
               >
-              <v-btn @click="sendRequest()" large color="primary" width="auto"
+              
+              <v-btn v-if="lobbyStatus == 'pending'" @click="sendRequest()" large color="primary" width="auto"
                 >ส่งคำขอการจองสนาม</v-btn
               >
             </v-row>
@@ -312,6 +313,7 @@ export default {
       selectedTime: null,
       isHost: false,
       annouceData: null,
+      lobbyStatus:null
     };
   },
   methods: {
@@ -321,8 +323,8 @@ export default {
         (this.user.username != undefined) &
         (this.$store.state.selectedCourt != "");
 
-      if (this.$store.state.courtDetail.Player_strict) {
-        if (this.memberCount < this.$store.state.courtDetail.Players) {
+      if (this.playerCondition.player_strict) {
+        if (this.memberCount < this.playerCondition.player) {
           this.errorText = {
             title: "ผู้เล่นไม่ครบตามเกณฑ์",
             text: "สนามนี้จำเป็นต้องมีผู้เล่นครบตามกำหนด",
@@ -332,10 +334,13 @@ export default {
           return;
         }
       }
+      this.$axios
+        .post("http://localhost:4000/sendBookingRequest", {
+          code: this.code,
+        })
+        .then((res) => {});
       // มีชื่อในสนามอื่นไหม,คนครบไหม,สนามว่างไหม
       // console.log(this.$store.state.courtDetail);
-      if (check) {
-      }
     },
     checkDelBtn(x) {
       // const user = this.inviteList.find((e) => e.id === x);
@@ -517,6 +522,7 @@ export default {
             console.log(res, "resss");
             this.selectedTime = `${res.data[0].Time_start} - ${res.data[0].Time_end}`;
             this.inviteList = [];
+            this.lobbyStatus = res.data[0].Status
             for (let i = 0; i < res.data.length; i++) {
               if (
                 res.data[i].Invite_status === "Host" &&

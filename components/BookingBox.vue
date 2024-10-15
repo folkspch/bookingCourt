@@ -25,9 +25,15 @@
               <div :class="$vuetify.breakpoint.xsOnly ? 'ml-3 mb-2' : ''">
                 <v-chip
                   dark
-                  color="amber"
+                  color="grey lighten-1"
                   v-if="bookingList.Status == 'pending'"
                   >กำลังดำเนินการ</v-chip
+                >
+                <v-chip
+                  dark
+                  color="amber"
+                  v-if="bookingList.Status == 'requesting'"
+                  >ส่งคำขอแล้ว</v-chip
                 >
                 <v-chip
                   dark
