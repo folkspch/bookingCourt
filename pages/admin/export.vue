@@ -21,7 +21,7 @@
             <v-select
               hide-details
               item-color="orange"
-              label="เลือกระยะเวลาที่ต้องการจอง"
+              label="เลือกระยะเวลาเริ่ม"
               v-model="selectedTimeA"
               :items="timeChoice"
               item-text="time"
@@ -38,7 +38,7 @@
             <v-select
               hide-details
               item-color="orange"
-              label="เลือกระยะเวลาที่ต้องการจอง"
+              label="เลือกระยะเวลาสิ้นสุด"
               v-model="selectedTimeB"
               :items="timeChoice.filter((item) => item.time >= selectedTimeA)"
               item-text="time"
@@ -71,12 +71,11 @@
         </v-row>
       </v-col>
     </v-row>
-    <!-- Add a button to trigger export -->
-    <v-btn @click="exportData()">Export Data</v-btn>
+    <!-- <v-btn @click="exportData()">Export Data</v-btn> -->
 
     <!-- Display simple data -->
     <div v-if="items.length">
-      <h2>Items</h2>
+      <h2>Data</h2>
       <table class="items-table">
         <thead>
           <tr>
@@ -94,12 +93,11 @@
         </tbody>
       </table>
     </div>
-
+    <v-btn @click="exportData()" class="export-button"> Export Data </v-btn>
     <!-- Your existing template code -->
     <!-- ... -->
   </div>
 </template>
-
 
 <script>
 import CourtDetail from "@/components/CourtDetail.vue";
@@ -134,7 +132,7 @@ export default {
       selectedTimeA: "",
       selectedTimeB: "",
       dateChoices: [], // Define dateChoices array
-      
+
       timeChoice: [
         { time: "09:00" },
         { time: "10:00" },
@@ -177,6 +175,8 @@ export default {
       timeChoice: [],
       invite_code: null,
       dialog: false,
+      selectedDateB:null,
+      selectedDateA:null,
       // Modified data structure with name and time properties
       items: [
         { stadium: "สนามบาสเก็ตบอล", time: "09:00-10:00", count: "7" },
@@ -186,6 +186,7 @@ export default {
         { stadium: "สนามบาสเก็ตบอล", time: "15:00-16:00", count: "5" },
         // Add more items as needed
       ],
+
       // Your existing data properties
       // ...
     };
@@ -213,33 +214,64 @@ export default {
       }
     },
     exportData() {
-      // Convert data to CSV format
-      const csvContent =
-        "data:text/csv;charset=utf-8," +
-        "Stadium,Time,Count\n" +
-        this.items
-          .map((item) => `${item.stadium},${item.time},${item.count}`)
-          .join("\n");
+  // Convert data to CSV format with UTF-8 BOM for proper encoding
+  const csvContent =
+    "\uFEFF" + // UTF-8 BOM for handling non-ASCII characters (like Thai)
+    "Stadium,Time,Count\n" +
+    this.items
+      .map((item) => `${item.stadium},${item.time},${item.count}`)
+      .join("\n");
 
-      // Create a temporary anchor element
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "exported_data.csv");
+  // Create a temporary anchor element
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", "exported_data.csv");
 
-      // Append the anchor to the body and click it programmatically to trigger download
-      document.body.appendChild(link);
-      link.click();
+  // Append the anchor to the body and click it programmatically to trigger download
+  document.body.appendChild(link);
+  link.click();
 
-      // Cleanup
-      document.body.removeChild(link);
-    },
+  // Cleanup
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url); // Release the object URL
+},
     getData() {
       console.log("assadsads");
       console.log(this.selectedTimeA);
       console.log(this.selectedTimeB);
       console.log(this.selectedDateA);
       console.log(this.selectedDateB);
+
+      if (!this.selectedCourt || (!this.selectedDateA && !this.selectedDateB)) {
+        alert("Please select a court and a date range");
+        return;
+      }
+
+      // Prepare query parameters for court_id, start_date, and end_date
+      const params = {
+        court_id: this.selectedCourt,
+        time_start: this.selectedTimeA || null,
+        time_end: this.selectedTimeB || null,
+        start_date: this.selectedDateA || null, // If only one date is provided, set the other as null
+        end_date: this.selectedDateB || null,
+      };
+    console.log("asdsad",params);
+
+    
+      // Send a GET request to the backend with the query parameters
+      this.$axios
+        .get("http://localhost:4000/admin/getCourtDataBooking", { params })
+        .then((response) => {
+          // Update the items with the received data
+          this.items = response.data.data;
+          console.log("Received data:", response);
+          console.log("Received data items:", this.items);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
       // query data ตาม field สนาม และ เวลา
     },
     setSelectedCourt() {
@@ -375,21 +407,85 @@ export default {
 .items-table {
   width: 100%;
   border-collapse: collapse;
+  background-color: #f9fafb; /* Soft off-white background */
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0; /* Light grey border for the entire table */
 }
 
 .items-table th,
 .items-table td {
-  padding: 8px;
-  border: 1px solid #ddd;
+  padding: 12px 15px;
+  border: 1px solid #e0e0e0; /* Light grey border for cells */
   text-align: left;
 }
 
 .items-table th {
-  background-color: #f2f2f2;
+  background-color: #eceff1; /* Light grey-blue for the header */
   font-weight: bold;
+  text-transform: uppercase;
+  color: #37474f; /* Darker grey-blue text for contrast */
 }
 
 .items-table tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #f1f8e9; /* Very light green for even rows */
+}
+
+.items-table tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* White for odd rows */
+}
+
+/* Styling for the export button */
+.export-button {
+  position: fixed;
+  bottom: 40px;
+  right: 20px;
+  background-color: #78909c; /* Soft blue-grey for the button */
+  color: #ffffff;
+  border-radius: 4px;
+  padding: 10px 20px;
+  box-shadow: none; /* No shadow for simplicity */
+}
+
+/* Input fields styling */
+.orange-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e0e0e0; /* Light grey border */
+  border-radius: 4px;
+}
+
+.orange-input:focus {
+  border-color: #90caf9; /* Soft blue on focus for consistency */
+  outline: none;
+}
+
+/* Select fields styling */
+.v-select .v-input__control {
+  border-color: #e0e0e0; /* Light grey border */
+}
+
+.v-select .v-input__control:focus-within {
+  border-color: #90caf9 !important; /* Soft blue on focus */
+}
+
+/* General styling */
+.v-row {
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 1.5em;
+  color: #37474f; /* Dark grey-blue text */
+  margin-bottom: 15px;
+}
+
+/* Button styling */
+.v-btn {
+  background-color: #90caf9; /* Soft blue */
+  color: #11ff00;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 4px;
 }
 </style>

@@ -1,73 +1,174 @@
 <template>
   <div>
-    <input type="file" @change="handleFileUpload" />
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Stadium</th>
-          <th>Day</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="row in excelData" :key="row.id" class="data-row">
-          <td>{{ row.stadium }}</td>
-          <td>{{ row.day }}</td>
-          <td>{{ row.time }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <v-btn @click="getLobbyList()" x-small class="import-button">
-      <v-icon color="green lighten-1">mdi-refresh</v-icon>
-      Import data
-    </v-btn>
+    <v-row>
+      <v-col>
+        <v-text-field
+          v-model="dateTimeStart"
+          label="Date Time Start"
+          type="datetime-local"
+          outlined
+        ></v-text-field>
+      </v-col>
+      <v-col>
+        <v-text-field
+          v-model="dateTimeEnd"
+          label="Date Time End"
+          type="datetime-local"
+          outlined
+        ></v-text-field>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" lg="5">
+        <v-select
+          hide-details
+          item-color="orange"
+          label="กรุณาเลือกสนามที่ต้องการจอง"
+          v-model="selectedCourt"
+          :items="court"
+          item-text="Name_th"
+          item-value="Court_id"
+          solo
+        ></v-select>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col class="file-upload">
+        <input type="file" color="primary" @change="handleFileUpload" />
+      </v-col>
+    </v-row>
+    <v-row>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>วัน / เวลา</th>
+              <th>09:00-10:00</th>
+              <th>10:00-11:00</th>
+              <th>11:00-12:00</th>
+              <th>12:00-13:00</th>
+              <th>13:00-14:00</th>
+              <th>14:00-15:00</th>
+              <th>15:00-16:00</th>
+              <th>16:00-17:00</th>
+              <th>17:00-18:00</th>
+              <th>18:00-19:00</th>
+              <th>19:00-20:00</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row) in excelData" :key="row.id" class="data-row">
+              <td><span>{{ row.days }}</span></td>
+              <td><input v-model="row.data9to10" /></td>
+              <td><input v-model="row.data10to11" /></td>
+              <td><input v-model="row.data11to12" /></td>
+              <td><input v-model="row.data12to13" /></td>
+              <td><input v-model="row.data13to14" /></td>
+              <td><input v-model="row.data14to15" /></td>
+              <td><input v-model="row.data15to16" /></td>
+              <td><input v-model="row.data16to17" /></td>
+              <td><input v-model="row.data17to18" /></td>
+              <td><input v-model="row.data18to19" /></td>
+              <td><input v-model="row.data19to20" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </v-row>
+    <v-row class="align-right">
+      <v-btn @click="importBookingData" color="green" class="import-button">
+        Import data
+      </v-btn>
+    </v-row>
   </div>
 </template>
 
 <script>
 import * as XLSX from "xlsx";
-
 export default {
   data() {
     return {
-      excelData: [],
-      dataBooking: [],
+      excelData: [], // Store processed Excel data
+      court: [],
+      selectedCourt: "",
+      dateTimeStart: "",
+      dateTimeEnd: "",
+      timeColumns: [
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "16:00-17:00",
+        "17:00-18:00",
+        "18:00-19:00",
+        "19:00-20:00",
+      ],
     };
+  },
+  async mounted() {
+    const response = await this.$axios.get("http://localhost:4000/getCourtData");
+    this.court = response.data;
   },
   methods: {
     handleFileUpload(event) {
       const file = event.target.files[0];
-
       const reader = new FileReader();
       reader.onload = (e) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: "array" });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-        this.excelData = jsonData.map((row, id) => ({
-          id,
-          stadium: row[0],
-          day: row[1],
-          time: row[2],
+        // Process the data
+        const processedData = jsonData.slice(1, 11).map((row) => ({
+          days: row[0],
+          data9to10: row[1] || "",
+          data10to11: row[2] || "",
+          data11to12: row[3] || "",
+          data12to13: row[4] || "",
+          data13to14: row[5] || "",
+          data14to15: row[6] || "",
+          data15to16: row[7] || "",
+          data16to17: row[8] || "",
+          data17to18: row[9] || "",
+          data18to19: row[10] || "",
+          data19to20: row[11] || "",
         }));
+        this.excelData = processedData;
       };
-
       reader.readAsArrayBuffer(file);
     },
-    getLobbyList() {
-      this.dataBooking = [...this.excelData];
-      console.log("<--",this.dataBooking);
-      console.log("-->",this.dataBooking[0].stadium);
-      console.log("-->",this.dataBooking[0].day);
-      console.log("-->",this.dataBooking[0].time);
-    },
+    async importBookingData() {
+    const payload = {
+      court_id: this.selectedCourt,
+      dateTimeStart: this.dateTimeStart,
+      dateTimeEnd: this.dateTimeEnd,
+      bookings: this.excelData, // Ensure excelData is sent correctly
+    };
+
+    try {
+      const response = await this.$axios.post(
+        "http://localhost:4000/admin/import-booking-admin",
+        payload
+      );
+      console.log("Import successful:", response.data);
+    } catch (error) {
+      console.error("Import failed:", error);
+    }
+  },
   },
 };
 </script>
 
 <style scoped>
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -78,6 +179,7 @@ export default {
   padding: 8px;
   border: 1px solid #ddd;
   text-align: left;
+  white-space: nowrap;
 }
 
 .data-table th {
@@ -85,11 +187,20 @@ export default {
   font-weight: bold;
 }
 
-.data-table tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+.data-table td input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.data-row {
-  /* Add your CSS styles for table rows here */
+.align-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.import-button {
+  margin-right: 10px;
 }
 </style>
