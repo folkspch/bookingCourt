@@ -14,29 +14,7 @@
           solo
         ></v-select>
       </v-col>
-      <div class="px-5">หรือ</div>
-      <v-col cols="12" lg="6">
-        <v-row no-gutters class="d-flex">
-          <v-col cols="9" lg="">
-            <v-text-field
-              hide-details
-              v-model="invite_code"
-              solo
-              placeholder="กรอกรหัสเข้าร่วมการจอง"
-              label="กรอกรหัสเข้าร่วมการจอง"
-            >
-              <v-icon slot="append" @click="paste()">
-                mdi-content-paste
-              </v-icon>
-            </v-text-field>
-          </v-col>
-          <v-col>
-            <v-btn @click="joinByCode()" color="primary" height="48px"
-              >เข้าร่วม</v-btn
-            >
-          </v-col>
-        </v-row>
-      </v-col>
+      
     </v-row>
     <v-simple-table v-if="this.selectedCourt" class="mb-5">
       <template v-slot:default>
@@ -72,7 +50,7 @@
             <!-- <div v-if="selectedCourt"> -->
 
             <td
-              v-for="index in countSlot"
+              v-for="index in 10"
               :key="index"
               :id="'table' + index"
             ></td>
@@ -218,13 +196,13 @@ export default {
       timeChoice: [],
       invite_code: null,
       dialog: false,
-      loading:false
+      loading: false,
     };
   },
 
   methods: {
     createLobby() {
-      this.loading = true
+      this.loading = true;
       let body = {
         court: this.selectedCourt,
         time_start: this.selectedTime[0],
@@ -238,29 +216,20 @@ export default {
         this.$axios
           .post("http://localhost:4000/createList", body)
           .then((res) => {
-            this.loading = false
+            this.loading = false;
             this.$router.push({
-                name: "confirm_booking",
-                params: {
-                  code: res.data.code,
-                  court: res.data.court,
-                },
-              });
+              name: "confirm_booking",
+              params: {
+                code: res.data.code,
+                court: res.data.court,
+              },
+            });
           });
       } else {
-        this.loading = false
+        this.loading = false;
         console.error("error occurred");
       }
     },
-    // setSelectedCourt() {
-    //   let data = this.court.find((e) => e.Court_id === this.selectedCourt);
-    //   data.time = this.selectedTime[0] + "-" + this.selectedTime[1];
-    //   this.$store.commit("setSelectedTime", this.selectedTime);
-    //   this.$store.commit("setSelectedCourt", this.selectedCourt);
-    //   this.$store.commit("setCourtDetail", data);
-    //   console.log(this.$store.state.courtDetail);
-    //   this.$router.replace("/confirm_booking");
-    // },
     isInRange(value, range) {
       if (this.plotStatus == 1) {
         return true;
@@ -269,66 +238,128 @@ export default {
       }
     },
     plotTable() {
-  let d = new Date();
-  let today = `${d.getFullYear()}-${(d.getMonth() + 1)
-    .toString()
-    .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
+      let d = new Date();
+      let today = `${d.getFullYear()}-${(d.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
 
-  console.log("Today's Date:", today);
+      console.log("Today's Date:", today);
 
-  const options = {
-    url: `http://localhost:4000/getBookingData/${today}/${this.selectedCourt}`,
-    method: "GET",
-  };
+      const options = {
+        url: `http://localhost:4000/getBookingData/${today}/${this.selectedCourt}`,
+        method: "GET",
+      };
 
-  // Get court details
-  const courtDetail = this.court.find(
-    (e) => e.Court_id === this.selectedCourt
-  );
-  const OpsHour =
-    parseInt(courtDetail.TimeClose.substring(0, 2)) -
-    parseInt(courtDetail.TimeOpen.substring(0, 2));
+      // Get court details
+      const courtDetail = this.court.find(
+        (e) => e.Court_id === this.selectedCourt
+      );
+      const OpsHour =
+        parseInt(courtDetail.TimeClose.substring(0, 2)) -
+        parseInt(courtDetail.TimeOpen.substring(0, 2));
 
-  // Adjust the slot count if needed
-  this.countSlot = Math.max(this.countSlot, OpsHour);
+      // Adjust the slot count if needed
+      this.countSlot = Math.max(this.countSlot, OpsHour);
 
-  // Fetch booking data
-  this.$axios(options).then((res) => {
-    this.table = res.data.data;
-    console.log("Total Slots:", this.countSlot);
-    console.log("Booking Data:", this.table);
+      // Fetch booking data
+      this.$axios(options).then((res) => {
+        this.table = res.data.data;
+        console.log("Total Slots:", this.countSlot);
+        console.log("Booking Data:", this.table);
 
-    // Reset all slot statuses
-    for (let i = 0; i < this.countSlot; i++) {
-      const slot = document.getElementById(`table${i + 1}`);
-      slot.classList.remove("reserved", "pending", "free");
-    }
-
-    // Update slot statuses based on booking data
-    for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
-      const timeSlot = this.OpsTime.ArrTime[i].Time[0];
-      console.log('this.table[i].Time_Start' , this.table[i]?.Time_Start);
-      console.log('this.table[i].timeSlot' , timeSlot);
-        const slotElement = document.getElementById(`table${i + 1}`);
-      if(this.table[i]?.Time_Start === (timeSlot)){
-        console.log('asdsad' ,this.table[i]);
-        if (this.table[i]?.Status === "reserved") {
-          slotElement.classList.add("reserved");
-        } else if (this.table[i]?.Status === "pending") {
-          slotElement.classList.add("pending");
+        // Reset all slot statuses
+        console.log("this.countSlot",this.countSlot);
+        
+        for (let i = 0; i < 10; i++) {
+          const slot = document.getElementById(`table${i + 1}`);
+          slot.classList.remove("reserved", "pending", "free");
+          slot.classList.add("free");
         }
-      }else{
-        slotElement.classList.add("free");
+        
 
-      }
-      
-    }
+        // Update slot statuses based on booking data
+        for (let out = 0; out < this.table.length; out++) {
+          for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
+            const timeSlot = this.OpsTime.ArrTime[i].Time[0];
+            console.log("this.table[i].Time_Start", this.table[i]?.Time_Start);
+            console.log("this.table[i].timeSlot", timeSlot);
+            const slotElement = document.getElementById(`table${i + 1}`);
+            if (this.table[out]?.Time_Start === timeSlot) {
+              console.log("asdsad", this.table[i]);
+              if (this.table[out]?.Status === "reserved") {
+                slotElement.classList.remove("reserved", "pending", "free");
+                slotElement.classList.add("reserved");
+              } else if (this.table[out]?.Status === "pending") {
+                console.log("some data");
+                slotElement.classList.remove("reserved", "pending", "free");
+                slotElement.classList.add("pending");
+              } else {
+                slotElement.classList.remove("reserved", "pending", "free");
 
-    this.filterTime();
-  });
+                slotElement.classList.add("free");
+              }
+            } else {
+              slotElement.classList.remove("reserved", "pending", "free");
 
-  this.setOpTime();
-},
+              slotElement.classList.add("free");
+            }
+          }
+        }
+
+        this.filterTime();
+      });
+      const daysOfWeek = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+
+      let currentDay = daysOfWeek[d.getDay()];
+      const options2 = {
+        url: `http://localhost:4000/admin/getBookingDataAdmin/${currentDay}/${this.selectedCourt}`,
+        method: "GET",
+      };
+      this.$axios(options2).then((res) => {
+        this.table = res.data.data;
+        console.log("res.data :", res.data.data);
+        console.log("Total Slots:", this.countSlot);
+        console.log("Booking Data:", this.table);
+
+        // Reset all slot statuses
+        for (let i = 0; i < 10; i++) {
+          const slot = document.getElementById(`table${i + 1}`);
+        }
+
+        // Update slot statuses based on booking data
+        for (let out = 0; out < this.table.length; out++) {
+          for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
+            const timeSlot = this.OpsTime.ArrTime[i].Time[0];
+            console.log("this.table[i].Time_Start2", this.table[i]);
+            console.log(
+              "this.table[i].Time_Start2aas",
+              this.table[i]?.time_start
+            );
+            console.log("this.table[i].timeSlot2", timeSlot);
+            const slot = document.getElementById(`table${i + 1}`);
+            if (this.table[out]?.time_start === timeSlot) {
+              console.log("asfdrkgjfn");
+              slot.classList.remove("reserved", "pending", "free");
+
+              slot.classList.add("reserved");
+            } else {
+            }
+          }
+        }
+
+        this.filterTime();
+      });
+
+      this.setOpTime();
+    },
     setOpTime() {
       console.log("SET");
       this.OpsTime.ArrTime = [];
@@ -340,7 +371,7 @@ export default {
         this.court[parseInt(this.selectedCourt) - 1].TimeClose.substring(0, 2)
       );
       console.log("ggin", this.OpsTime.OpenTime, this.OpsTime.CloseTime);
-      for (let i = this.OpsTime.OpenTime; i < this.OpsTime.CloseTime; i++) {
+      for (let i = 9; i < 19; i++) {
         var temp1 = i + ":00";
         var temp2 = i + 1 + ":00";
         this.OpsTime.ArrTime.push({

@@ -211,27 +211,29 @@ export default {
       }
     },
     exportData() {
-      // Convert data to CSV format
-      const csvContent =
-        "data:text/csv;charset=utf-8," +
-        "Stadium,Time,Count\n" +
-        this.items
-          .map((item) => `${item.stadium},${item.time},${item.count}`)
-          .join("\n");
+  // Convert data to CSV format with UTF-8 BOM for proper encoding
+  const csvContent =
+    "\uFEFF" + // UTF-8 BOM for handling non-ASCII characters (like Thai)
+    "Stadium,Time,Count\n" +
+    this.items
+      .map((item) => `${item.stadium},${item.time},${item.count}`)
+      .join("\n");
 
-      // Create a temporary anchor element
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "exported_data.csv");
+  // Create a temporary anchor element
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", "exported_data.csv");
 
-      // Append the anchor to the body and click it programmatically to trigger download
-      document.body.appendChild(link);
-      link.click();
+  // Append the anchor to the body and click it programmatically to trigger download
+  document.body.appendChild(link);
+  link.click();
 
-      // Cleanup
-      document.body.removeChild(link);
-    },
+  // Cleanup
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url); // Release the object URL
+},
     getData() {
       console.log("assadsads");
       console.log(this.selectedTimeA);

@@ -43,7 +43,6 @@
           <thead>
             <tr>
               <th>วัน / เวลา</th>
-              <th>08:00-09:00</th>
               <th>09:00-10:00</th>
               <th>10:00-11:00</th>
               <th>11:00-12:00</th>
@@ -60,7 +59,6 @@
           <tbody>
             <tr v-for="(row) in excelData" :key="row.id" class="data-row">
               <td><span>{{ row.days }}</span></td>
-              <td><input v-model="row.data8to9" /></td>
               <td><input v-model="row.data9to10" /></td>
               <td><input v-model="row.data10to11" /></td>
               <td><input v-model="row.data11to12" /></td>
@@ -96,7 +94,6 @@ export default {
       dateTimeStart: "",
       dateTimeEnd: "",
       timeColumns: [
-        "08:00-09:00",
         "09:00-10:00",
         "10:00-11:00",
         "11:00-12:00",
@@ -128,18 +125,17 @@ export default {
         // Process the data
         const processedData = jsonData.slice(1, 11).map((row) => ({
           days: row[0],
-          data8to9: row[1] || "",
-          data9to10: row[2] || "",
-          data10to11: row[3] || "",
-          data11to12: row[4] || "",
-          data12to13: row[5] || "",
-          data13to14: row[6] || "",
-          data14to15: row[7] || "",
-          data15to16: row[8] || "",
-          data16to17: row[9] || "",
-          data17to18: row[10] || "",
-          data18to19: row[11] || "",
-          data19to20: row[12] || "",
+          data9to10: row[1] || "",
+          data10to11: row[2] || "",
+          data11to12: row[3] || "",
+          data12to13: row[4] || "",
+          data13to14: row[5] || "",
+          data14to15: row[6] || "",
+          data15to16: row[7] || "",
+          data16to17: row[8] || "",
+          data17to18: row[9] || "",
+          data18to19: row[10] || "",
+          data19to20: row[11] || "",
         }));
         this.excelData = processedData;
       };

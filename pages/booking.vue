@@ -72,7 +72,7 @@
             <!-- <div v-if="selectedCourt"> -->
 
             <td
-              v-for="index in countSlot"
+              v-for="index in 10"
               :key="index"
               :id="'table' + index"
             ></td>
@@ -251,7 +251,7 @@ export default {
         this.loading = false;
         console.error("error occurred");
       }
-    }, 
+    },
     isInRange(value, range) {
       if (this.plotStatus == 1) {
         return true;
@@ -290,35 +290,58 @@ export default {
         console.log("Booking Data:", this.table);
 
         // Reset all slot statuses
-        for (let i = 0; i < this.countSlot; i++) {
+        console.log("this.countSlot",this.countSlot);
+        
+        for (let i = 0; i < 10; i++) {
           const slot = document.getElementById(`table${i + 1}`);
           slot.classList.remove("reserved", "pending", "free");
+          slot.classList.add("free");
         }
+        
 
         // Update slot statuses based on booking data
-        for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
-          const timeSlot = this.OpsTime.ArrTime[i].Time[0];
-          console.log("this.table[i].Time_Start", this.table[i]?.Time_Start);
-          console.log("this.table[i].timeSlot", timeSlot);
-          const slotElement = document.getElementById(`table${i + 1}`);
-          if (this.table[i]?.Time_Start === timeSlot) {
-            console.log("asdsad", this.table[i]);
-            if (this.table[i]?.Status === "reserved") {
-              slotElement.classList.add("reserved");
-            } else if (this.table[i]?.Status === "pending") {
-              slotElement.classList.add("pending");
+        for (let out = 0; out < this.table.length; out++) {
+          for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
+            const timeSlot = this.OpsTime.ArrTime[i].Time[0];
+            console.log("this.table[i].Time_Start", this.table[i]?.Time_Start);
+            console.log("this.table[i].timeSlot", timeSlot);
+            const slotElement = document.getElementById(`table${i + 1}`);
+            if (this.table[out]?.Time_Start === timeSlot) {
+              console.log("asdsad", this.table[i]);
+              if (this.table[out]?.Status === "reserved") {
+                slotElement.classList.remove("reserved", "pending", "free");
+                slotElement.classList.add("reserved");
+              } else if (this.table[out]?.Status === "pending") {
+                console.log("some data");
+                slotElement.classList.remove("reserved", "pending", "free");
+                slotElement.classList.add("pending");
+              } else {
+                slotElement.classList.remove("reserved", "pending", "free");
+
+                slotElement.classList.add("free");
+              }
+            } else {
+              slotElement.classList.remove("reserved", "pending", "free");
+
+              slotElement.classList.add("free");
             }
-          } else {
-            slotElement.classList.add("free");
           }
         }
 
         this.filterTime();
       });
-        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const daysOfWeek = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
 
       let currentDay = daysOfWeek[d.getDay()];
-const options2 = {
+      const options2 = {
         url: `http://localhost:4000/admin/getBookingDataAdmin/${currentDay}/${this.selectedCourt}`,
         method: "GET",
       };
@@ -329,24 +352,28 @@ const options2 = {
         console.log("Booking Data:", this.table);
 
         // Reset all slot statuses
-        for (let i = 0; i < this.countSlot; i++) {
+        for (let i = 0; i < 10; i++) {
           const slot = document.getElementById(`table${i + 1}`);
-          slot.classList.remove("reserved", "pending", "free");
         }
 
         // Update slot statuses based on booking data
-        for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
-          const timeSlot = this.OpsTime.ArrTime[i].Time[0];
-          console.log("this.table[i].Time_Start2", this.table[i]);
-          console.log("this.table[i].Time_Start2aas", this.table[i]?.time_start);
-          console.log("this.table[i].timeSlot2", timeSlot);
-          const slotElement = document.getElementById(`table${i + 1}`);
-          if (this.table[i]?.time_start === timeSlot) {
-            console.log("asfdrkgjfn");
-            
-              slotElement.classList.add("reserved");
-          } else {
-            slotElement.classList.add("free");
+        for (let out = 0; out < this.table.length; out++) {
+          for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
+            const timeSlot = this.OpsTime.ArrTime[i].Time[0];
+            console.log("this.table[i].Time_Start2", this.table[i]);
+            console.log(
+              "this.table[i].Time_Start2aas",
+              this.table[i]?.time_start
+            );
+            console.log("this.table[i].timeSlot2", timeSlot);
+            const slot = document.getElementById(`table${i + 1}`);
+            if (this.table[out]?.time_start === timeSlot) {
+              console.log("asfdrkgjfn");
+              slot.classList.remove("reserved", "pending", "free");
+
+              slot.classList.add("reserved");
+            } else {
+            }
           }
         }
 
@@ -366,7 +393,7 @@ const options2 = {
         this.court[parseInt(this.selectedCourt) - 1].TimeClose.substring(0, 2)
       );
       console.log("ggin", this.OpsTime.OpenTime, this.OpsTime.CloseTime);
-      for (let i = this.OpsTime.OpenTime; i < this.OpsTime.CloseTime; i++) {
+      for (let i = 9; i < 19; i++) {
         var temp1 = i + ":00";
         var temp2 = i + 1 + ":00";
         this.OpsTime.ArrTime.push({
