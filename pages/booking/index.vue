@@ -245,6 +245,8 @@ export default {
                 code: res.data.code,
                 court: res.data.court,
               },
+              path: `/booking/confirm_booking/${res.data.court}?code=${res.data.code}`,
+              
             });
           });
       } else {
@@ -427,11 +429,7 @@ export default {
             console.log("res", res);
             if (res.data.length != 0) {
               this.$router.push({
-                name: "confirm_booking",
-                params: {
-                  code: res.data.code,
-                  court: res.data.court,
-                },
+                path: `/booking/confirm_booking/${res.data.court}?code=${res.data.code}`
               });
             } else {
               this.dialog = true;

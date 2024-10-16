@@ -267,12 +267,10 @@
 <script>
 import CourtDetail from "@/components/CourtDetail.vue";
 export default {
-  middleware: "checkBookingValue",
+  middleware: "checkIsAdmin",
   async asyncData({ params }) {
     const code = params.code;
     const court = params.court;
-
-    console.log(court, code);
     return { code, court };
   },
   components: {

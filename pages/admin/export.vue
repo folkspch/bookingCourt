@@ -175,6 +175,8 @@ export default {
       timeChoice: [],
       invite_code: null,
       dialog: false,
+      selectedDateB:null,
+      selectedDateA:null,
       // Modified data structure with name and time properties
       items: [
         { stadium: "สนามบาสเก็ตบอล", time: "09:00-10:00", count: "7" },
@@ -184,6 +186,7 @@ export default {
         { stadium: "สนามบาสเก็ตบอล", time: "15:00-16:00", count: "5" },
         // Add more items as needed
       ],
+
       // Your existing data properties
       // ...
     };
