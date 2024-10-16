@@ -117,15 +117,15 @@
       <div class="modal-background" @click="closeCancelModal"></div>
       <div class="modal-content large-modal">
         <span class="close" @click="closeCancelModal">&times;</span>
-        <h2>Reject Booking</h2>
+        <h2>ยกเลิกการจอง</h2>
         <v-row>
           <v-col cols="4">
-            <strong>Reason for Rejection:</strong>
+            <strong>สาเหตุยกเลิกการจอง :</strong>
           </v-col>
           <v-col cols="8">
             <v-text-field
               v-model="cancelReason"
-              label="Enter rejection reason"
+              label="ระบุสาเหตุ"
               outlined
             ></v-text-field>
           </v-col>
@@ -160,60 +160,60 @@ export default {
       filteredJoinList: [], // To store the filtered data from joinList
       court: [],
       lobbyList: [
-        {
-          stadium: "สนามบาสเก็ตบอล",
-          name: "ณพล ศรีสุวรรณ",
-          time: "09:00 - 10:00",
-          idLobby: "a001",
-        },
-        {
-          stadium: "สนามวอลเลบอล",
-          name: "เดช เดชาบูรพา",
-          time: "11:00 - 12:00",
-          idLobby: "a002",
-        },
-        {
-          stadium: "สนามฟุตซอล",
-          name: "ศุภชัย พีระชัยรัตน์",
-          time: "15:00 - 16:00",
-          idLobby: "a003",
-        },
-        {
-          stadium: "สนามแบตมินตัน",
-          name: "เอก ยิ่งเจริญ",
-          time: "14:00 - 15:00",
-          idLobby: "a004",
-        },
+        // {
+        //   stadium: "สนามบาสเก็ตบอล",
+        //   name: "ณพล ศรีสุวรรณ",
+        //   time: "09:00 - 10:00",
+        //   idLobby: "a001",
+        // },
+        // {
+        //   stadium: "สนามวอลเลบอล",
+        //   name: "เดช เดชาบูรพา",
+        //   time: "11:00 - 12:00",
+        //   idLobby: "a002",
+        // },
+        // {
+        //   stadium: "สนามฟุตซอล",
+        //   name: "ศุภชัย พีระชัยรัตน์",
+        //   time: "15:00 - 16:00",
+        //   idLobby: "a003",
+        // },
+        // {
+        //   stadium: "สนามแบตมินตัน",
+        //   name: "เอก ยิ่งเจริญ",
+        //   time: "14:00 - 15:00",
+        //   idLobby: "a004",
+        // },
       ],
       joinList: [
-        {
-          id: "1",
-          court: "02",
-          name: "ณพล ศรีสุวรรณ",
-          idLobby: "ASD123",
-          time: "09:00 - 10:00",
-        },
-        {
-          id: "2",
-          court: "02",
-          name: "เดช เดชาบูรพา",
-          idLobby: "ASD123",
-          time: "11:00 - 12:00",
-        },
-        {
-          id: "3",
-          court: "02",
-          name: "ศุภชัย พีระชัยรัตน์",
-          idLobby: "ASD123",
-          time: "15:00 - 16:00",
-        },
-        {
-          id: "4",
-          court: "02",
-          name: "เอก ยิ่งเจริญ",
-          idLobby: "ASD123",
-          time: "14:00 - 15:00",
-        },
+        // {
+        //   id: "1",
+        //   court: "02",
+        //   name: "ณพล ศรีสุวรรณ",
+        //   idLobby: "ASD123",
+        //   time: "09:00 - 10:00",
+        // },
+        // {
+        //   id: "2",
+        //   court: "02",
+        //   name: "เดช เดชาบูรพา",
+        //   idLobby: "ASD123",
+        //   time: "11:00 - 12:00",
+        // },
+        // {
+        //   id: "3",
+        //   court: "02",
+        //   name: "ศุภชัย พีระชัยรัตน์",
+        //   idLobby: "ASD123",
+        //   time: "15:00 - 16:00",
+        // },
+        // {
+        //   id: "4",
+        //   court: "02",
+        //   name: "เอก ยิ่งเจริญ",
+        //   idLobby: "ASD123",
+        //   time: "14:00 - 15:00",
+        // },
       ],
       OpsTime: { OpenTime: null, CloseTime: null, ArrTime: [] },
     };

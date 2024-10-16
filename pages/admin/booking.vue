@@ -14,7 +14,6 @@
           solo
         ></v-select>
       </v-col>
-      
     </v-row>
     <v-simple-table v-if="this.selectedCourt" class="mb-5">
       <template v-slot:default>
@@ -49,11 +48,7 @@
             </td>
             <!-- <div v-if="selectedCourt"> -->
 
-            <td
-              v-for="index in 10"
-              :key="index"
-              :id="'table' + index"
-            ></td>
+            <td v-for="index in 10" :key="index" :id="'table' + index"></td>
 
             <!-- </div> -->
           </tr>
@@ -120,6 +115,20 @@
             </v-row>
           </v-card>
         </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="8">
+          <v-col cols="4">
+            <strong>สาเหตุการจอง :</strong>
+          </v-col>
+          <v-col cols="8">
+            <v-text-field
+              label="ระบุสาเหตุ"
+              v-model="remarkBooking"
+              outlined
+            ></v-text-field>
+          </v-col>
+        </v-col>
         <v-col cols="12" lg="6">
           <div
             v-if="this.selectedCourt && this.selectedTime"
@@ -128,7 +137,7 @@
             <v-btn
               :absolute="!$vuetify.breakpoint.xsOnly"
               :loading="this.loading"
-              @click="createLobby()"
+              @click="showConfirmModal()"
               large
               bottom
               right
@@ -141,6 +150,32 @@
       </v-row>
     </div>
     <!-- <v-btn @click="filterTime()">GG</v-btn> -->
+    <v-dialog
+      v-model="confirmDialog"
+      persistent
+      max-width="1400"
+      class="custom-dialog"
+    >
+      <v-card>
+        <v-card-title class="headline">ยืนยันการจอง</v-card-title>
+        <v-card-text>
+          คุณต้องการจองสนาม <strong>{{ this.court_name }}</strong>
+        </v-card-text>
+        <v-card-text>
+          ในช่วงเวลา
+          <strong>{{ this.time_start + " - " + this.time_end }}</strong>
+        </v-card-text>
+        <v-card-text>
+          สาเหตุการณ์จอง <strong>{{ this.remark_modal }}</strong>
+        </v-card-text>
+        <v-card-text> ใช่หรือไม่? </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green" text @click="confirmBooking">ยืนยัน</v-btn>
+          <v-btn color="red" text @click="confirmDialog = false">ยกเลิก</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="dialog" persistent>
       <v-card>
         <v-card-title>ไม่พบรหัสเข้าร่วม</v-card-title>
@@ -187,8 +222,14 @@ export default {
         },
       ],
       listCourt: [],
+      time_start: null,
+      remarkBooking: "",
+      time_end: null,
       selectedCourt: null,
       selectedTime: null,
+      confirmDialog: false,
+      courtDetails: {},
+
       OpsTime: { OpenTime: null, CloseTime: null, ArrTime: [] },
       table: [],
       plotStatus: 0,
@@ -201,33 +242,66 @@ export default {
   },
 
   methods: {
-    createLobby() {
-      this.loading = true;
+    showConfirmModal() {
+      const courtDetail = this.court.find(
+        (e) => e.Court_id === this.selectedCourt
+      );
+      this.courtDetails = courtDetail;
+      this.confirmDialog = true;
+      this.time_start = this.selectedTime[0];
+      this.time_end = this.selectedTime[1];
+      this.court_name = this.court[parseInt(this.selectedCourt) - 1].Name_th;
+      this.remark_modal = this.remarkBooking;
+      console.log("dfhgfh,", this.selectedTime[0]);
+      console.log("sdfgdgf", this.selectedTime[1]);
+      console.log(
+        "sdfgdgf",
+        this.court[parseInt(this.selectedCourt) - 1].Name_th
+      );
+    },
+    confirmBooking() {
+  console.log("asd");
+  
+      const d = new Date();
+      const daysOfWeek = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const currentDay = daysOfWeek[d.getDay()];
+      const currentDate = d.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+
       let body = {
-        court: this.selectedCourt,
-        time_start: this.selectedTime[0],
-        time_end: this.selectedTime[1],
+        day: currentDay, // Today’s day, e.g., "Monday"
+        court: this.selectedCourt, // Selected court
+        time_start: this.selectedTime[0], // Start time
+        time_end: this.selectedTime[1], // End time
+        description: this.remark_modal, // Booking reason/remark
+        date_start: currentDate, // Today’s date in YYYY-MM-DD
+        date_end: currentDate, // Same as date_start
       };
-      if (
-        (body.court != "") &
-        (body.time_start != null) &
-        (body.time_end != null)
-      ) {
+
+      if (body.court && body.time_start && body.time_end) {
         this.$axios
-          .post("http://localhost:4000/createList", body)
+          .post("http://localhost:4000/admin/booking-admin", body)
           .then((res) => {
+            console.log("Booking successful:", res.data);
+
+        // Stop loading and navigate to /admin/booking
+        this.loading = false;
+        this.$router.push("/admin/stadium");
+          })
+          .catch((error) => {
             this.loading = false;
-            this.$router.push({
-              name: "confirm_booking",
-              params: {
-                code: res.data.code,
-                court: res.data.court,
-              },
-            });
+            console.error("Error occurred:", error);
           });
       } else {
         this.loading = false;
-        console.error("error occurred");
+        console.error("Error: Missing required fields");
       }
     },
     isInRange(value, range) {
@@ -268,14 +342,13 @@ export default {
         console.log("Booking Data:", this.table);
 
         // Reset all slot statuses
-        console.log("this.countSlot",this.countSlot);
-        
+        console.log("this.countSlot", this.countSlot);
+
         for (let i = 0; i < 10; i++) {
           const slot = document.getElementById(`table${i + 1}`);
           slot.classList.remove("reserved", "pending", "free");
           slot.classList.add("free");
         }
-        
 
         // Update slot statuses based on booking data
         for (let out = 0; out < this.table.length; out++) {
@@ -446,6 +519,26 @@ export default {
   border-style: solid;
   border-width: 5px;
   border-color: #ebecf0;
+}
+.custom-dialog {
+  width: 90% !important; /* Occupy 90% of the screen width */
+  max-height: 90vh !important; /* Use 90% of the viewport height */
+  overflow-y: auto; /* Allow scrolling if the content exceeds the height */
+}
+
+.v-card {
+  padding: 32px; /* Add more padding for better spacing */
+  height: 100%; /* Ensure the card fills the dialog */
+}
+
+.v-card-title {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.v-card-text {
+  font-size: 20px;
+  margin-bottom: 24px;
 }
 .none {
   all: unset;
