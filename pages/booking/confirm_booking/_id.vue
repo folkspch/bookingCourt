@@ -43,6 +43,27 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="requestSent" persistent>
+      <v-card>
+        <v-card-title
+          ><v-icon class="mr-1" slot="prepend" color="green"> mdi-check </v-icon
+          >คำขอถูกส่งแล้ว</v-card-title
+        >
+        <v-card-text>โปรดรอการอนุมัติจากผู้ดูแล</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="success"
+            @click="
+              requestSent = false;
+              getLobbyList();
+            "
+            >ตกลง</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="canceledDialog" persistent>
       <v-card>
         <v-card-title>ยกเลิกการจอง</v-card-title>
@@ -228,8 +249,13 @@
                 width="auto"
                 >ยกเลิกการจอง</v-btn
               >
-              
-              <v-btn v-if="lobbyStatus == 'pending'" @click="sendRequest()" large color="primary" width="auto"
+
+              <v-btn
+                v-if="lobbyStatus == 'pending'"
+                @click="sendRequest()"
+                large
+                color="primary"
+                width="auto"
                 >ส่งคำขอการจองสนาม</v-btn
               >
             </v-row>
@@ -313,7 +339,8 @@ export default {
       selectedTime: null,
       isHost: false,
       annouceData: null,
-      lobbyStatus:null
+      lobbyStatus: null,
+      requestSent: false,
     };
   },
   methods: {
@@ -322,7 +349,7 @@ export default {
       let check =
         (this.user.username != undefined) &
         (this.$store.state.selectedCourt != "");
-
+      console.log(this.playerCondition.player_strict)
       if (this.playerCondition.player_strict) {
         if (this.memberCount < this.playerCondition.player) {
           this.errorText = {
@@ -338,7 +365,11 @@ export default {
         .post("http://localhost:4000/sendBookingRequest", {
           code: this.code,
         })
-        .then((res) => {});
+        .then((res) => {
+          if (res.status == 200) {
+            this.requestSent = true;
+          }
+        });
       // มีชื่อในสนามอื่นไหม,คนครบไหม,สนามว่างไหม
       // console.log(this.$store.state.courtDetail);
     },
@@ -522,7 +553,7 @@ export default {
             console.log(res, "resss");
             this.selectedTime = `${res.data[0].Time_start} - ${res.data[0].Time_end}`;
             this.inviteList = [];
-            this.lobbyStatus = res.data[0].Status
+            this.lobbyStatus = res.data[0].Status;
             for (let i = 0; i < res.data.length; i++) {
               if (
                 res.data[i].Invite_status === "Host" &&
@@ -531,7 +562,7 @@ export default {
                 this.isHost = true;
               }
               this.playerCondition.player = res.data[0].Players;
-              this.playerCondition.player_strict = res.data[0].Players_strict;
+              this.playerCondition.player_strict = res.data[0].Player_strict;
               this.inviteList.push({
                 id: res.data[i].User_id,
                 name: res.data[i].User_name,
