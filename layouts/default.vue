@@ -128,7 +128,7 @@ export default {
         {
           icon: "mdi-contacts",
           title: "index",
-          to: "/admin/index",
+          to: "/admin",
         },
         {
           icon: "mdi-contacts",
