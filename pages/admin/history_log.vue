@@ -82,6 +82,9 @@
           <v-col cols="" lg="">
             <v-btn @click="getData()">Get Data</v-btn>
           </v-col>
+           <v-col cols="" lg="">
+            <v-btn @click="clearData()">Clear Data</v-btn>
+          </v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -140,7 +143,9 @@
     <div class="modal" v-if="showLogModal">
       <div class="modal-background" @click="closeLogModal"></div>
       <div class="modal-content large-modal">
+        <!-- Add the close button -->
         <span class="close" @click="closeLogModal">&times;</span>
+
         <h2>ข้อมูลการจอง</h2>
         <v-row>
           <v-col cols="4">
@@ -364,6 +369,9 @@ export default {
   },
   methods: {
     // Method to export data in CSV format
+    closeLogModal() {
+      this.showLogModal = false; // Close the log modal
+    },
     updateTimeChoices() {
       // Update the items available for selection in selectTimeB
       // based on the value selected in selectTimeA
@@ -473,6 +481,14 @@ export default {
       document.body.removeChild(link);
       URL.revokeObjectURL(url); // Release the object URL
     },
+    clearData(){
+      this.selectedCourt = '',
+        this.selectedTimeA = '',
+         this.selectedTimeB = '',
+         this.selectedDateA = '', // If only one date is provided, set the other as null
+         this.selectedDateB = '',
+         this.courtCode = ''
+    },
     getData() {
       console.log("assadsads");
       console.log(this.selectedTimeA);
@@ -480,31 +496,38 @@ export default {
       console.log(this.selectedDateA);
       console.log(this.selectedDateB);
 
-      if (!this.selectedCourt || (!this.selectedDateA && !this.selectedDateB)) {
-        alert("Please select a court and a date range");
-        return;
-      }
-
       // Prepare query parameters for court_id, start_date, and end_date
       const params = {
-        court_id: this.selectedCourt,
+        court_id: this.selectedCourt || null,
         time_start: this.selectedTimeA || null,
         time_end: this.selectedTimeB || null,
         start_date: this.selectedDateA || null, // If only one date is provided, set the other as null
         end_date: this.selectedDateB || null,
+        court_code: this.courtCode || null,
       };
       console.log("asdsad", params);
 
       // Send a GET request to the backend with the query parameters
       this.$axios
-        .get("http://localhost:4000/admin/getCourtDataBooking", { params })
+        .get("http://localhost:4000/admin/getBookingHistory", { params })
         .then((response) => {
-          // Update the items with the received data
-          this.items = response.data.data;
+          // Check if data was returned
+          if (response.data.data && response.data.data.length > 0) {
+            // Update the items with the received data
+            this.items = response.data.data;
+            this.lobbyList = response.data.data; // Make sure lobbyList gets updated for the table
+          } else {
+            // If no data is returned, make sure the items array is cleared
+            this.items = [];
+            this.lobbyList = []; // Clear the table when no data is returned
+            console.log("No data returned, table cleared.");
+          }
           console.log("Received data:", response);
-          console.log("Received data items:", this.items);
         })
         .catch((error) => {
+          // Handle any error by clearing the items array and logging the error
+          this.items = [];
+          this.lobbyList = []; // Clear the table in case of an error
           console.error("Error fetching data:", error);
         });
       // query data ตาม field สนาม และ เวลา
@@ -575,41 +598,41 @@ export default {
       this.setOpTime();
     },
     exportPDF() {
-  if (!this.selectedLobbyId || this.filteredJoinList.length === 0) {
-    alert("No lobby selected or no data available for export.");
-    return;
-  }
+      if (!this.selectedLobbyId || this.filteredJoinList.length === 0) {
+        alert("No lobby selected or no data available for export.");
+        return;
+      }
 
-  const doc = new jsPDF();
+      const doc = new jsPDF();
 
-  // Use a built-in font for testing
-  doc.setFont("helvetica"); // Set default font
-  doc.setFontSize(18);
-  doc.text(`Lobby Booking Report for ${this.selectedLobbyId}`, 20, 20);
+      // Use a built-in font for testing
+      doc.setFont("helvetica"); // Set default font
+      doc.setFontSize(18);
+      doc.text(`Report Booking Lobby : ${this.selectedLobbyId}`, 20, 20);
 
-  // Get the selected lobby details
-  const lobbyDetails = this.filteredJoinList[0];
+      // Get the selected lobby details
+      const lobbyDetails = this.filteredJoinList[0];
 
-  // Add lobby details
-  doc.setFontSize(12);
-  doc.text(`Lobby ID: ${this.selectedLobbyId}`, 20, 40);
-  doc.text(`Stadium: ${lobbyDetails.court_en || "N/A"}`, 20, 50);
-  doc.text(`Booking Host: ${lobbyDetails.name || "N/A"}`, 20, 60);
-  doc.text(`Date Reserved: ${lobbyDetails.dateReserve || "N/A"}`, 20, 70);
-  doc.text(`Time: ${lobbyDetails.time || "N/A"}`, 20, 80);
+      // Add lobby details
+      doc.setFontSize(12);
+      doc.text(`Lobby ID: ${this.selectedLobbyId}`, 20, 40);
+      doc.text(`Stadium: ${lobbyDetails.court_en || "N/A"}`, 20, 50);
+      doc.text(`Booking Host: ${lobbyDetails.name || "N/A"}`, 20, 60);
+      doc.text(`Date Reserved: ${lobbyDetails.dateReserve || "N/A"}`, 20, 70);
+      doc.text(`Time: ${lobbyDetails.time || "N/A"}`, 20, 80);
 
-  // Add player names in bulleted format
-  let yOffset = 90; // Set the starting Y position for the list
-  doc.text("Players:", 20, yOffset); // Add "Players:" title
+      // Add player names in bulleted format
+      let yOffset = 90; // Set the starting Y position for the list
+      doc.text("Players:", 20, yOffset); // Add "Players:" title
 
-  this.filteredJoinList.forEach((item, index) => {
-    yOffset += 10; // Move down by 10 units for each player
-    doc.text(`- ${item.name || "N/A"}`, 30, yOffset); // Add bullet and player name
-  });
+      this.filteredJoinList.forEach((item, index) => {
+        yOffset += 10; // Move down by 10 units for each player
+        doc.text(`- ${item.name || "N/A"}`, 30, yOffset); // Add bullet and player name
+      });
 
-  // Save the PDF
-  doc.save(`${this.selectedLobbyId}_booking_report.pdf`);
-},
+      // Save the PDF
+      doc.save(`${this.selectedLobbyId}_booking_report.pdf`);
+    },
     setOpTime() {
       console.log("SET");
       for (let i = this.OpsTime.OpenTime; i < this.OpsTime.CloseTime; i += 3) {
@@ -830,9 +853,32 @@ h2 {
   position: absolute;
   top: 10px;
   right: 10px;
-  font-size: 24px; /* Bigger text size for the close button */
-  cursor: pointer; /* Pointer cursor on hover */
-  color: #d32f2f; /* Red color for the close button */
+  font-size: 24px;
+  cursor: pointer;
+  color: #d32f2f;
+}
+
+/* Modal background and content styling remains unchanged */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  position: relative;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  width: 600px;
+  max-width: 90%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Styling for buttons inside the modal */
@@ -851,5 +897,13 @@ h2 {
   border: 1px solid #ddd; /* Light gray border */
   border-radius: 4px; /* Rounded corners */
   resize: none; /* Prevents resizing */
+}
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #d32f2f;
 }
 </style>

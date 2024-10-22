@@ -355,16 +355,18 @@ export default {
         for (let out = 0; out < this.table.length; out++) {
           for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
             const timeSlot = this.OpsTime.ArrTime[i].Time[0];
-            console.log("this.table[i].Time_Start", this.table[i]?.Time_Start);
+            console.log("this.table[i].Time_Start", this.table[out]?.Time_Start);
+            console.log("this.table[i].Time_Start.s", this.table[out].Time_Start.substring(1));
             console.log("this.table[i].timeSlot", timeSlot);
             const slotElement = document.getElementById(`table${i + 1}`);
-            if (this.table[out]?.Time_Start === timeSlot) {
-              console.log("asdsad", this.table[i]);
+            if (this.table[out]?.Time_Start === timeSlot || this.table[out].Time_Start.substring(1) === timeSlot) {
+              console.log("index = ", i, " time start = ",this.table[out]?.Time_Start , " + time slot = ", timeSlot);
+              console.log("index = ", i, " status = ",this.table[out]?.Status);
               if (this.table[out]?.Status === "reserved") {
                 slotElement.classList.remove("reserved", "pending", "free");
                 slotElement.classList.add("reserved");
               } else if (this.table[out]?.Status === "pending") {
-                console.log("some data");
+                console.log("some data + " , this.table[out]);
                 slotElement.classList.remove("reserved", "pending", "free");
                 slotElement.classList.add("pending");
               } else {
@@ -372,11 +374,7 @@ export default {
 
                 slotElement.classList.add("free");
               }
-            } else {
-              slotElement.classList.remove("reserved", "pending", "free");
-
-              slotElement.classList.add("free");
-            }
+            } 
           }
         }
 
@@ -407,9 +405,7 @@ export default {
         for (let i = 0; i < 10; i++) {
           const slot = document.getElementById(`table${i + 1}`);
         }
-
-        // Update slot statuses based on booking data
-        for (let out = 0; out < this.table.length; out++) {
+for (let out = 0; out < this.table.length; out++) {
           for (let i = 0; i < this.OpsTime.ArrTime.length; i++) {
             const timeSlot = this.OpsTime.ArrTime[i].Time[0];
             console.log("this.table[i].Time_Start2", this.table[i]);
@@ -428,6 +424,8 @@ export default {
             }
           }
         }
+        // Update slot statuses based on booking data
+        
 
         this.filterTime();
       });

@@ -162,6 +162,12 @@ export default {
         },
         {
           icon: "mdi-contacts",
+          title: "hostory log",
+          to: "/admin/history_log",
+        
+        },
+        {
+          icon: "mdi-contacts",
           title: "export",
           to: "/admin/export",
         },
